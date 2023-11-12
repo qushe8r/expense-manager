@@ -1,5 +1,6 @@
 package com.qushe8r.expensemanager.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +40,10 @@ public class TokenProvider {
   public String generateAccessToken(
       String subject, Date issuedAt, Date expiration, Map<String, Object> claims) {
     return generateAccessToken(subject, issuedAt, expiration, claims, secretKey());
+  }
+
+  public Claims extractClaims(String token) {
+    return Jwts.parser().verifyWith(secretKey()).build().parseSignedClaims(token).getPayload();
   }
 
   private SecretKey secretKey(String secret) {

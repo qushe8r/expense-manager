@@ -1,8 +1,11 @@
 package com.qushe8r.expensemanager.security.jwt;
 
+import com.qushe8r.expensemanager.stub.JwtFactory;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -27,6 +30,10 @@ class TokenProviderTest {
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private TokenProvider tokenProvider;
+
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+  @Autowired
+  private JwtProperties jwtProperties;
 
   @DisplayName("generateAccessToken(): JWT 정상 발급 테스트")
   @Test
@@ -61,5 +68,42 @@ class TokenProviderTest {
     Assertions.assertThat(payload.getSubject()).isEqualTo("subject");
     Assertions.assertThat(payload.get(stringName, String.class)).isEqualTo(stringValue);
     Assertions.assertThat(payload.get(longName, Long.class)).isEqualTo(longValue);
+  }
+
+  @DisplayName("extractClaims(): Claims 추출 테스트")
+  @Test
+  void extractClaims() {
+    // given
+    JwtFactory jwtFactory = JwtFactory.withDefaultValues();
+    String token = jwtFactory.generateToken(jwtProperties);
+
+    // when
+    Claims claims = tokenProvider.extractClaims(token);
+
+    // then
+    Assertions.assertThat(claims.getSubject()).isEqualTo(jwtFactory.getSubject());
+    Assertions.assertThat(claims.getExpiration()).isBefore(jwtFactory.getExpiration());
+  }
+
+  @DisplayName("extractClaimsThrowSignatureException(): 유효하지 않은 토큰일때 SignautreException을 던진다.")
+  @Test
+  void extractClaimsThrowSignatureException() {
+    // given
+    String token = JwtFactory.withDefaultValues().generateInvalidToken();
+
+    // when & then
+    Assertions.assertThatThrownBy(() -> tokenProvider.extractClaims(token))
+        .isInstanceOf(SignatureException.class);
+  }
+
+  @DisplayName("extractClaimsThrowExpiredJwtException(): 만료된 토큰일 때 ExpiredJwtException을 던진다.")
+  @Test
+  void extractClaimsThrowExpiredJwtException() {
+    // given
+    String token = JwtFactory.withExpired().generateToken(jwtProperties);
+
+    // when & then
+    Assertions.assertThatThrownBy(() -> tokenProvider.extractClaims(token))
+        .isInstanceOf(ExpiredJwtException.class);
   }
 }
