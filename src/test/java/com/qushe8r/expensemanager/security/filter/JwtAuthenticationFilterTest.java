@@ -9,6 +9,7 @@ import com.qushe8r.expensemanager.security.jwt.TokenProvider;
 import com.qushe8r.expensemanager.security.repository.RefreshTokenRepository;
 import com.qushe8r.expensemanager.security.utils.CookieCreator;
 import com.qushe8r.expensemanager.security.utils.CookieProperties;
+import com.qushe8r.expensemanager.stub.JwtFactory;
 import java.io.IOException;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -108,7 +109,7 @@ class JwtAuthenticationFilterTest {
   @Test
   void successfulAuthentication() {
     // given
-    jwtProperties.setSecret("JWT_SECRET_KEY_FOR_TEST_WITHOUT_WEAK_KEY_EXCEPTION");
+    jwtProperties.setSecret(JwtFactory.TEST_SECRET);
     jwtProperties.setAccessTokenExpirationMinutes(100);
     jwtProperties.setRefreshTokenExpirationMinutes(100);
 
