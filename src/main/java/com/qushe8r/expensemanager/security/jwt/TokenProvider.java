@@ -42,6 +42,21 @@ public class TokenProvider {
     return generateAccessToken(subject, issuedAt, expiration, claims, secretKey());
   }
 
+  public String generateRefreshToken(
+      String subject, Date issuedAt, Date expiration, SecretKey secretKey) {
+    return Jwts.builder()
+        .subject(subject)
+        .issuedAt(issuedAt)
+        .expiration(expiration)
+        .signWith(secretKey)
+        .compact();
+  }
+
+  public String generateRefreshToken(
+      String subject, Date issuedAt, Date expiration, String secret) {
+    return generateRefreshToken(subject, issuedAt, expiration, secretKey(secret));
+  }
+
   public Claims extractClaims(String token) {
     return Jwts.parser().verifyWith(secretKey()).build().parseSignedClaims(token).getPayload();
   }

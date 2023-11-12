@@ -70,6 +70,28 @@ class TokenProviderTest {
     Assertions.assertThat(payload.get(longName, Long.class)).isEqualTo(longValue);
   }
 
+  @Test
+  void generateRefreshToken() {
+    // given
+    String subject = "subject";
+
+    String secret = "JWT_SECRET_KEY_FOR_TEST_WITHOUT_WEAK_KEY_EXCEPTION";
+    byte[] base64EncodedSecret =
+        Base64.getEncoder().encode(secret.getBytes(StandardCharsets.UTF_8));
+    SecretKey secretKey = Keys.hmacShaKeyFor(base64EncodedSecret);
+
+    Date issuedAt = new Date();
+    Date expiration = new Date(new Date().getTime() + Duration.ofMinutes(5).toMillis());
+
+    String refreshToken = tokenProvider.generateRefreshToken(subject, issuedAt, expiration, secret);
+    // when
+    Claims payload =
+        Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(refreshToken).getPayload();
+
+    // then
+    Assertions.assertThat(payload.getSubject()).isEqualTo(subject);
+  }
+
   @DisplayName("extractClaims(): Claims 추출 테스트")
   @Test
   void extractClaims() {
