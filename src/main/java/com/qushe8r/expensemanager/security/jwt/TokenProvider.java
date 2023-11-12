@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import javax.crypto.SecretKey;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 public class TokenProvider {
 
   private final JwtProperties jwtProperties;
+
+  public static final String BEARER = "Bearer ";
 
   public String generateAccessToken(
       String subject,
@@ -42,6 +45,11 @@ public class TokenProvider {
     return generateAccessToken(subject, issuedAt, expiration, claims, secretKey());
   }
 
+  public String generateBearerAccessToken(String subject, Map<String, Object> claims) {
+    return BEARER
+        + generateAccessToken(subject, new Date(), accessTokenExpiration(), claims, secretKey());
+  }
+
   public String generateRefreshToken(
       String subject, Date issuedAt, Date expiration, SecretKey secretKey) {
     return Jwts.builder()
@@ -57,8 +65,16 @@ public class TokenProvider {
     return generateRefreshToken(subject, issuedAt, expiration, secretKey(secret));
   }
 
+  public String generateRefreshToken(String subject) {
+    return generateRefreshToken(subject, new Date(), refreshTokenExpiration(), secretKey());
+  }
+
   public Claims extractClaims(String token) {
     return Jwts.parser().verifyWith(secretKey()).build().parseSignedClaims(token).getPayload();
+  }
+
+  public Long refreshExpiration() {
+    return refreshTokenExpiration().getTime();
   }
 
   private SecretKey secretKey(String secret) {
@@ -69,5 +85,19 @@ public class TokenProvider {
 
   private SecretKey secretKey() {
     return secretKey(jwtProperties.getSecret());
+  }
+
+  private Date accessTokenExpiration() {
+    return getTime(jwtProperties.getAccessTokenExpirationMinutes());
+  }
+
+  private Date refreshTokenExpiration() {
+    return getTime(jwtProperties.getRefreshTokenExpirationMinutes());
+  }
+
+  private Date getTime(Integer minutes) {
+    Calendar time = Calendar.getInstance();
+    time.add(Calendar.MINUTE, minutes);
+    return time.getTime();
   }
 }
