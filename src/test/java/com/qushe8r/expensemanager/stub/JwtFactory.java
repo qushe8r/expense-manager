@@ -1,6 +1,7 @@
 package com.qushe8r.expensemanager.stub;
 
 import com.qushe8r.expensemanager.security.jwt.JwtProperties;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +13,8 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 
 public class JwtFactory {
+
+  public static final String TEST_SECRET = "JWT_SECRET_KEY_FOR_TEST_WITHOUT_WEAK_KEY_EXCEPTION";
 
   private String subject = "test@email";
 
@@ -52,6 +55,16 @@ public class JwtFactory {
         .compact();
   }
 
+  public String generateStubToken() {
+    return Jwts.builder()
+        .subject(subject)
+        .issuedAt(issuedAt)
+        .expiration(expiration)
+        .claims(claims)
+        .signWith(secretKey(TEST_SECRET))
+        .compact();
+  }
+
   public String generateInvalidToken() {
     return Jwts.builder()
         .subject(subject)
@@ -60,6 +73,14 @@ public class JwtFactory {
         .claims(claims)
         .signWith(secretKey("INVALID_VALUE_SECRET_KEY_FOR_INVALID_TOKEN_TEST"))
         .compact();
+  }
+
+  public Claims getStubClaims() {
+    return Jwts.parser()
+        .verifyWith(secretKey(TEST_SECRET))
+        .build()
+        .parseSignedClaims(generateStubToken())
+        .getPayload();
   }
 
   private SecretKey secretKey(String secret) {

@@ -1,5 +1,6 @@
 package com.qushe8r.expensemanager.member.entity;
 
+import io.jsonwebtoken.Claims;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,12 @@ public class MemberDetails implements UserDetails {
     this.id = id;
     this.email = email;
     this.password = password;
+  }
+
+  public MemberDetails(Claims claims) {
+    this.id = claims.get("id", Long.class);
+    this.email = claims.getSubject();
+    this.password = "";
   }
 
   public Map<String, Object> claims() {
