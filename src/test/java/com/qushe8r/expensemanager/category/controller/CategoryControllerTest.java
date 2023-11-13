@@ -2,10 +2,12 @@ package com.qushe8r.expensemanager.category.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
+import com.qushe8r.expensemanager.category.dto.CategoryResponse;
 import com.qushe8r.expensemanager.category.dto.PostCategory;
 import com.qushe8r.expensemanager.category.service.CategoryService;
 import com.qushe8r.expensemanager.macher.PostCategoryMatcher;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -90,5 +92,28 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("name"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("getCategories(): 조회 성공시 카테고리 목록을 반환한다.")
+  @Test
+  void getCategories() throws Exception {
+    // given
+    List<CategoryResponse> response = List.of(new CategoryResponse(1L, CATEGORY_NAME));
+    BDDMockito.given(categoryService.getCategories()).willReturn(response);
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").isNumber())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name").isString())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME));
   }
 }
