@@ -52,8 +52,11 @@ class TokenProviderTest {
     Long longValue = new Random().nextLong();
     Map<String, Object> claims = Map.of(stringName, stringValue, longName, longValue);
 
+    String jti = "jti";
+
     String accessToken =
         tokenProvider.generateAccessToken(
+            jti,
             subject,
             new Date(),
             new Date(new Date().getTime() + Duration.ofMinutes(5).toMillis()),
@@ -73,6 +76,8 @@ class TokenProviderTest {
   @Test
   void generateRefreshToken() {
     // given
+    String jti = "jti";
+
     String subject = "subject";
 
     String secret = "JWT_SECRET_KEY_FOR_TEST_WITHOUT_WEAK_KEY_EXCEPTION";
@@ -83,7 +88,8 @@ class TokenProviderTest {
     Date issuedAt = new Date();
     Date expiration = new Date(new Date().getTime() + Duration.ofMinutes(5).toMillis());
 
-    String refreshToken = tokenProvider.generateRefreshToken(subject, issuedAt, expiration, secret);
+    String refreshToken =
+        tokenProvider.generateRefreshToken(jti, subject, issuedAt, expiration, secret);
     // when
     Claims payload =
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(refreshToken).getPayload();

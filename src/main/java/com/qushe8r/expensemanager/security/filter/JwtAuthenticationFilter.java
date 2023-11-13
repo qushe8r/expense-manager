@@ -13,6 +13,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpHeaders;
@@ -55,12 +56,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
       FilterChain chain,
       Authentication authResult) {
     MemberDetails principal = (MemberDetails) authResult.getPrincipal();
+    String jti = UUID.randomUUID().toString();
 
     String bearerAccessToken =
-        tokenProvider.generateBearerAccessToken(principal.getEmail(), principal.claims());
+        tokenProvider.generateBearerAccessToken(jti, principal.getEmail(), principal.claims());
 
-    String refreshToken = tokenProvider.generateRefreshToken(principal.getEmail());
-    saveRefreshTokenToRedis(refreshToken, principal);
+    String refreshToken = tokenProvider.generateRefreshToken(jti, principal.getEmail());
+    saveRefreshTokenToRedis(jti, refreshToken, principal);
 
     Cookie cookie =
         CookieCreator.createCookie(
@@ -72,8 +74,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     response.addCookie(cookie);
   }
 
-  private void saveRefreshTokenToRedis(String refreshToken, MemberDetails principal) {
+  private void saveRefreshTokenToRedis(String jti, String refreshToken, MemberDetails principal) {
     refreshTokenRepository.save(
-        new RefreshToken(refreshToken, principal.getUsername(), tokenProvider.refreshExpiration()));
+        new RefreshToken(
+            jti, refreshToken, principal.getUsername(), tokenProvider.refreshExpiration()));
   }
 }

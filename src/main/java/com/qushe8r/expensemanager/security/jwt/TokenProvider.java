@@ -21,12 +21,14 @@ public class TokenProvider {
   public static final String BEARER = "Bearer ";
 
   public String generateAccessToken(
+      String jti,
       String subject,
       Date issuedAt,
       Date expiration,
       Map<String, Object> claims,
       SecretKey secretKey) {
     return Jwts.builder()
+        .id(jti)
         .subject(subject)
         .issuedAt(issuedAt)
         .expiration(expiration)
@@ -36,23 +38,30 @@ public class TokenProvider {
   }
 
   public String generateAccessToken(
-      String subject, Date issuedAt, Date expiration, Map<String, Object> claims, String secret) {
-    return generateAccessToken(subject, issuedAt, expiration, claims, secretKey(secret));
+      String jti,
+      String subject,
+      Date issuedAt,
+      Date expiration,
+      Map<String, Object> claims,
+      String secret) {
+    return generateAccessToken(jti, subject, issuedAt, expiration, claims, secretKey(secret));
   }
 
   public String generateAccessToken(
-      String subject, Date issuedAt, Date expiration, Map<String, Object> claims) {
-    return generateAccessToken(subject, issuedAt, expiration, claims, secretKey());
+      String jti, String subject, Date issuedAt, Date expiration, Map<String, Object> claims) {
+    return generateAccessToken(jti, subject, issuedAt, expiration, claims, secretKey());
   }
 
-  public String generateBearerAccessToken(String subject, Map<String, Object> claims) {
+  public String generateBearerAccessToken(String jti, String subject, Map<String, Object> claims) {
     return BEARER
-        + generateAccessToken(subject, new Date(), accessTokenExpiration(), claims, secretKey());
+        + generateAccessToken(
+            jti, subject, new Date(), accessTokenExpiration(), claims, secretKey());
   }
 
   public String generateRefreshToken(
-      String subject, Date issuedAt, Date expiration, SecretKey secretKey) {
+      String jti, String subject, Date issuedAt, Date expiration, SecretKey secretKey) {
     return Jwts.builder()
+        .id(jti)
         .subject(subject)
         .issuedAt(issuedAt)
         .expiration(expiration)
@@ -61,12 +70,12 @@ public class TokenProvider {
   }
 
   public String generateRefreshToken(
-      String subject, Date issuedAt, Date expiration, String secret) {
-    return generateRefreshToken(subject, issuedAt, expiration, secretKey(secret));
+      String jti, String subject, Date issuedAt, Date expiration, String secret) {
+    return generateRefreshToken(jti, subject, issuedAt, expiration, secretKey(secret));
   }
 
-  public String generateRefreshToken(String subject) {
-    return generateRefreshToken(subject, new Date(), refreshTokenExpiration(), secretKey());
+  public String generateRefreshToken(String jti, String subject) {
+    return generateRefreshToken(jti, subject, new Date(), refreshTokenExpiration(), secretKey());
   }
 
   public Claims extractClaims(String token) {

@@ -40,7 +40,7 @@ class RefreshTokenRepositoryTest {
   @Test
   void save() {
     // given
-    RefreshToken refreshToken = new RefreshToken("token", "email", 10L);
+    RefreshToken refreshToken = new RefreshToken("id", "token", "email", 10L);
 
     // when
     refreshTokenRepository.save(refreshToken);
@@ -51,7 +51,7 @@ class RefreshTokenRepositoryTest {
                 (RedisConnection connection) ->
                     connection
                         .keyCommands()
-                        .exists(("Refresh:" + refreshToken.getToken()).getBytes(CHARSET))))
+                        .exists(("Refresh:" + refreshToken.getId()).getBytes(CHARSET))))
         .isTrue();
   }
 
@@ -59,12 +59,12 @@ class RefreshTokenRepositoryTest {
   @Test
   void findById() {
     // given
-    RefreshToken refreshToken = new RefreshToken("token", "email", 10L);
+    RefreshToken refreshToken = new RefreshToken("id", "token", "email", 10L);
     RefreshToken saved = refreshTokenRepository.save(refreshToken);
 
     // when
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    RefreshToken find = refreshTokenRepository.findById(saved.getToken()).get();
+    RefreshToken find = refreshTokenRepository.findById(saved.getId()).get();
 
     // then
     Assertions.assertThat(find)
@@ -76,14 +76,14 @@ class RefreshTokenRepositoryTest {
   @Test
   void timeToLive() {
     // given
-    RefreshToken refreshToken = new RefreshToken("token", "email", 1L);
+    RefreshToken refreshToken = new RefreshToken("id", "token", "email", 1L);
     RefreshToken saved = refreshTokenRepository.save(refreshToken);
 
     // When & then
     Awaitility.with()
         .conditionEvaluationListener(condition -> System.out.println("isThere?:"))
         .await()
-        .atMost(10000, TimeUnit.MILLISECONDS)
+        .atMost(refreshToken.getExpiration() * 2, TimeUnit.SECONDS)
         .pollInterval(Duration.ofMillis(100))
         .until(() -> refreshTokenRepository.findById(saved.getToken()).isEmpty());
   }
@@ -92,8 +92,8 @@ class RefreshTokenRepositoryTest {
   @Test
   void findByEmail() {
     // given
-    RefreshToken token1 = new RefreshToken("token#1", "email#1", 1L);
-    RefreshToken token2 = new RefreshToken("token#2", "email#1", 1L);
+    RefreshToken token1 = new RefreshToken("id#1", "token#1", "email#1", 1L);
+    RefreshToken token2 = new RefreshToken("id#2", "token#2", "email#1", 1L);
     refreshTokenRepository.saveAll(List.of(token1, token2));
 
     // when
@@ -113,8 +113,8 @@ class RefreshTokenRepositoryTest {
   @Test
   void timeToLive2() {
     // given
-    RefreshToken token1 = new RefreshToken("token#1", "email#1", 1L);
-    RefreshToken token2 = new RefreshToken("token#2", "email#1", 1L);
+    RefreshToken token1 = new RefreshToken("id#1", "token#1", "email#1", 1L);
+    RefreshToken token2 = new RefreshToken("id#2", "token#2", "email#1", 1L);
     refreshTokenRepository.saveAll(List.of(token1, token2));
 
     // when
@@ -124,7 +124,7 @@ class RefreshTokenRepositoryTest {
     Awaitility.with()
         .conditionEvaluationListener(condition -> System.out.println("isThere?:"))
         .await()
-        .atMost(10000, TimeUnit.MILLISECONDS)
+        .atMost(token1.getExpiration() * 2, TimeUnit.SECONDS)
         .pollInterval(Duration.ofMillis(100))
         .until(() -> refreshTokenRepository.findByEmail(token1.getEmail()).isEmpty());
   }

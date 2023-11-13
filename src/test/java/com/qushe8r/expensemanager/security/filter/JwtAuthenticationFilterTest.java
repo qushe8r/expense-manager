@@ -124,9 +124,12 @@ class JwtAuthenticationFilterTest {
     MockFilterChain filterChain = new MockFilterChain();
 
     BDDMockito.given(
-            tokenProvider.generateBearerAccessToken(Mockito.eq("username"), Mockito.anyMap()))
+            tokenProvider.generateBearerAccessToken(
+                Mockito.anyString(), Mockito.eq("username"), Mockito.anyMap()))
         .willReturn("ACCESS_TOKEN");
-    BDDMockito.given(tokenProvider.generateRefreshToken("username")).willReturn("REFRESH_TOKEN");
+    BDDMockito.given(
+            tokenProvider.generateRefreshToken(Mockito.anyString(), Mockito.eq("username")))
+        .willReturn("REFRESH_TOKEN");
 
     // when
     filter.successfulAuthentication(

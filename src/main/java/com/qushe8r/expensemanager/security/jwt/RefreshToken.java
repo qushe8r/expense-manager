@@ -12,7 +12,9 @@ import org.springframework.data.redis.core.index.Indexed;
 @AllArgsConstructor
 public class RefreshToken {
 
-  @Id private String token;
+  @Id private String id;
+
+  @Indexed private String token;
 
   @Indexed private String email;
 

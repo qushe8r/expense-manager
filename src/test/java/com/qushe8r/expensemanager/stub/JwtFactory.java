@@ -16,6 +16,8 @@ public class JwtFactory {
 
   public static final String TEST_SECRET = "JWT_SECRET_KEY_FOR_TEST_WITHOUT_WEAK_KEY_EXCEPTION";
 
+  private String jti = "jti";
+
   private String subject = "test@email";
 
   private Date issuedAt = new Date();
@@ -47,6 +49,7 @@ public class JwtFactory {
 
   public String generateToken(JwtProperties jwtProperties) {
     return Jwts.builder()
+        .id(jti)
         .subject(subject)
         .issuedAt(issuedAt)
         .expiration(expiration)
@@ -57,6 +60,7 @@ public class JwtFactory {
 
   public String generateStubToken() {
     return Jwts.builder()
+        .id(jti)
         .subject(subject)
         .issuedAt(issuedAt)
         .expiration(expiration)
@@ -67,6 +71,7 @@ public class JwtFactory {
 
   public String generateInvalidToken() {
     return Jwts.builder()
+        .id(jti)
         .subject(subject)
         .issuedAt(issuedAt)
         .expiration(expiration)
