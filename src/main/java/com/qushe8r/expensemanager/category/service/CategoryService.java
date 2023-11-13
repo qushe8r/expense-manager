@@ -28,7 +28,8 @@ public class CategoryService {
   }
 
   public List<CategoryResponse> getCategories() {
-    return null;
+    List<Category> categories = categoryRepository.findAll();
+    return categoryMapper.toResponse(categories);
   }
 
   private void validateCategoryExistByName(String name) {

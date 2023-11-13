@@ -1,11 +1,13 @@
 package com.qushe8r.expensemanager.category.service;
 
 import com.qushe8r.expensemanager.category.dto.CategoryMapper;
+import com.qushe8r.expensemanager.category.dto.CategoryResponse;
 import com.qushe8r.expensemanager.category.dto.PostCategory;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.exception.CategoryAlreadyExistException;
 import com.qushe8r.expensemanager.category.repository.CategoryRepository;
 import com.qushe8r.expensemanager.macher.CategoryMatcher;
+import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -68,5 +70,22 @@ class CategoryServiceTest {
     Assertions.assertThatThrownBy(() -> categoryService.crateCategory(postCategory))
         .isInstanceOf(CategoryAlreadyExistException.class);
     Mockito.verify(categoryRepository, Mockito.times(1)).findByName(CATEGORY_NAME_EXAMPLE);
+  }
+
+  @DisplayName("getCategories(): 조회에 성공하면 CategoryResponse 리스트를 반환한다.")
+  @Test
+  void getCategories() {
+    // given
+    List<Category> categories = List.of(new Category(1L, CATEGORY_NAME_EXAMPLE));
+    BDDMockito.given(categoryRepository.findAll()).willReturn(categories);
+
+    // when
+    List<CategoryResponse> response = categoryService.getCategories();
+
+    // then
+    Assertions.assertThat(response).isNotEmpty();
+    Assertions.assertThat(response.get(0))
+        .hasFieldOrPropertyWithValue("id", 1L)
+        .hasFieldOrPropertyWithValue("name", CATEGORY_NAME_EXAMPLE);
   }
 }
