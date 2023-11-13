@@ -31,6 +31,12 @@ public class MemberDetails implements UserDetails {
     this.password = "";
   }
 
+  public MemberDetails(Member member) {
+    this.id = member.getId();
+    this.email = member.getEmail();
+    this.password = member.getPassword();
+  }
+
   public Map<String, Object> claims() {
     Map<String, Object> claims = new HashMap<>();
     List<String> list = getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
