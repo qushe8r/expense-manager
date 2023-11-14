@@ -2,10 +2,16 @@ package com.qushe8r.expensemanager.budget.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
+import com.qushe8r.expensemanager.budget.dto.BudgetResponse;
+import com.qushe8r.expensemanager.budget.dto.PatchBudget;
 import com.qushe8r.expensemanager.budget.dto.PostBudget;
+import com.qushe8r.expensemanager.budget.exception.BudgetExceptionCode;
+import com.qushe8r.expensemanager.budget.exception.BudgetNotFoundException;
 import com.qushe8r.expensemanager.budget.service.BudgetCreateUseCase;
+import com.qushe8r.expensemanager.budget.service.BudgetService;
 import com.qushe8r.expensemanager.config.TestSecurityConfig;
 import com.qushe8r.expensemanager.matcher.MemberDetailsMatcher;
+import com.qushe8r.expensemanager.matcher.PatchBudgetMatcher;
 import com.qushe8r.expensemanager.matcher.PostBudgetMatcher;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.YearMonth;
@@ -36,6 +42,8 @@ class BudgetControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private BudgetCreateUseCase budgetCreateUseCase;
+
+  @MockBean private BudgetService budgetService;
 
   @DisplayName("createBudget(): 입력값이 유효하면 성공한다")
   @WithMemberPrincipals
@@ -151,6 +159,112 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("categoryId"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("modifyBudget(): 입력 값이 유효하면 성공한다.")
+  @WithMemberPrincipals
+  @Test
+  void modifyBudget() throws Exception {
+    // given
+    Long budgetId = 1L;
+    Long modifyAmount = 150000L;
+    YearMonth month = YearMonth.of(2023, 8);
+    PatchBudget patchBudget = new PatchBudget(modifyAmount);
+    String content = objectMapper.writeValueAsString(patchBudget);
+
+    BDDMockito.given(
+            budgetService.modifyBudget(
+                Mockito.argThat(
+                    new MemberDetailsMatcher(new MemberDetails(1L, "test@email.com", "password"))),
+                Mockito.eq(budgetId),
+                Mockito.argThat(new PatchBudgetMatcher(patchBudget))))
+        .willReturn(new BudgetResponse(budgetId, modifyAmount, month));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.patch(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data").isMap())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.budgetId").isNumber())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.amount").isNumber())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.amount").value(150000L))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.month").isString())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.month").value(month.toString()));
+  }
+
+  @DisplayName("modifyBudgetBudgetNotFoundException(): 예산을 찾을 수 없습니다.")
+  @WithMemberPrincipals
+  @Test
+  void modifyBudgetBudgetNotFoundException() throws Exception {
+    // given
+    Long budgetId = 1L;
+    Long modifyAmount = 150000L;
+    PatchBudget patchBudget = new PatchBudget(modifyAmount);
+    String content = objectMapper.writeValueAsString(patchBudget);
+
+    BDDMockito.given(
+            budgetService.modifyBudget(
+                Mockito.argThat(
+                    new MemberDetailsMatcher(new MemberDetails(1L, "test@email.com", "password"))),
+                Mockito.eq(budgetId),
+                Mockito.argThat(new PatchBudgetMatcher(patchBudget))))
+        .willThrow(new BudgetNotFoundException());
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.patch(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    BudgetExceptionCode errorCode = BudgetExceptionCode.BUDGET_NOT_FOUND;
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNotFound())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value(errorCode.getErrorCode()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(errorCode.getStatus()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(errorCode.getMessage()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("modifyBudgetAmountNull(): 예산을 찾을 수 없습니다.")
+  @WithMemberPrincipals
+  @Test
+  void modifyBudgetAmountNull() throws Exception {
+    // given
+    Long budgetId = 1L;
+    PatchBudget patchBudget = new PatchBudget(null);
+    String content = objectMapper.writeValueAsString(patchBudget);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.patch(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("amount"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 }

@@ -15,5 +15,4 @@ public enum BudgetExceptionCode implements ExceptionCode {
   private final Integer status;
 
   private final String message;
-
 }
