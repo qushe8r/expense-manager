@@ -8,6 +8,7 @@ import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ public class BudgetController {
 
   @PostMapping
   public ResponseEntity<Void> createBudget(
-      @AuthenticationPrincipal MemberDetails memberDetails, @RequestBody PostBudget dto) {
+      @AuthenticationPrincipal MemberDetails memberDetails, @RequestBody @Validated PostBudget dto) {
     Long budgetId = budgetCreateUseCase.createBudget(memberDetails, dto);
     URI uri = UriCreator.createUri(BUDGET_DEFAULT_URL, budgetId);
     return ResponseEntity.created(uri).build();

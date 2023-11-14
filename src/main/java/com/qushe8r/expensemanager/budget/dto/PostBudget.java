@@ -1,5 +1,7 @@
 package com.qushe8r.expensemanager.budget.dto;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.YearMonth;
 
-public record PostBudget(Long budget, YearMonth month, Long categoryId) {}
+public record PostBudget(
+    @NotNull Long budget, @NotNull YearMonth month, @NotNull Long categoryId) {}

@@ -69,4 +69,88 @@ class BudgetControllerTest {
             MockMvcResultMatchers.header()
                 .string(HttpHeaders.LOCATION, BUDGET_DEFAULT_URL + "/" + createdBudgetId));
   }
+
+  @DisplayName("createBudget(): 예산이 null 이라면 실패한다")
+  @WithMemberPrincipals
+  @Test
+  void createBudgetBudgetNull() throws Exception {
+    // given
+    PostBudget postBudget = new PostBudget(null, YearMonth.of(2023, 8), 1L);
+    String content = objectMapper.writeValueAsString(postBudget);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(BUDGET_DEFAULT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("budget"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("createBudget(): 예산이 null 이라면 실패한다")
+  @WithMemberPrincipals
+  @Test
+  void createBudgetMonthNull() throws Exception {
+    // given
+    PostBudget postBudget = new PostBudget(100000L, null, 1L);
+    String content = objectMapper.writeValueAsString(postBudget);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(BUDGET_DEFAULT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("month"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("createBudget(): 카테고리 식별자가 null 이라면 실패한다")
+  @WithMemberPrincipals
+  @Test
+  void createBudgetCategoryIdNull() throws Exception {
+    // given
+    PostBudget postBudget = new PostBudget(100000L, YearMonth.of(2023, 8), null);
+    String content = objectMapper.writeValueAsString(postBudget);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(BUDGET_DEFAULT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("categoryId"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
 }
