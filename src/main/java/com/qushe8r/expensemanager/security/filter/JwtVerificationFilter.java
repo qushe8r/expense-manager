@@ -8,8 +8,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +39,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
-      @NonNull FilterChain filterChain) {
+      @NonNull FilterChain filterChain)
+      throws ServletException, IOException {
     try {
       setAuthenticationToContext(request);
     } catch (ExpiredJwtException e) {
@@ -48,6 +51,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
       log.warn("JwtException: {}", e.getClass());
       request.setAttribute(EXCEPTION, JwtExceptionCode.INVALID_TOKEN);
     }
+    filterChain.doFilter(request, response);
   }
 
   private void setAuthenticationToContext(HttpServletRequest request) {

@@ -114,6 +114,7 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").isNumber())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name").isString())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME));
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME));
   }
 }
