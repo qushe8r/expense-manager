@@ -9,6 +9,8 @@ import com.qushe8r.expensemanager.stub.StubHeader;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.ServletException;
+import java.io.IOException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,7 +74,7 @@ class JwtVerificationFilterTest {
 
   @DisplayName("doFilterInternal(): 인증에 성공하면 MemberDetails가 SecurityContextHolder에 담긴다.")
   @Test
-  void doFilterInternal() {
+  void doFilterInternal() throws ServletException, IOException {
     MockHttpServletRequest request = new MockHttpServletRequest();
     MockHttpServletResponse response = new MockHttpServletResponse();
     MockFilterChain filterChain = new MockFilterChain();
@@ -92,7 +94,7 @@ class JwtVerificationFilterTest {
   @DisplayName(
       "doFilterInternalExpiredJwtException(): 만료시 request attribute에 ExceptionCode가 담겨 있다.")
   @Test
-  void doFilterInternalExpiredJwtException() {
+  void doFilterInternalExpiredJwtException() throws ServletException, IOException {
     MockHttpServletRequest request = new MockHttpServletRequest();
     MockHttpServletResponse response = new MockHttpServletResponse();
     MockFilterChain filterChain = new MockFilterChain();
@@ -115,7 +117,7 @@ class JwtVerificationFilterTest {
   @DisplayName(
       "doFilterInternalSignatureException(): 에러 발생시 request attribute에 ExceptionCode가 담겨 있다.")
   @Test
-  void doFilterInternalSignatureException() {
+  void doFilterInternalSignatureException() throws ServletException, IOException {
     MockHttpServletRequest request = new MockHttpServletRequest();
     MockHttpServletResponse response = new MockHttpServletResponse();
     MockFilterChain filterChain = new MockFilterChain();
@@ -136,7 +138,7 @@ class JwtVerificationFilterTest {
 
   @DisplayName("doFilterInternalJwtException(): 에러 발생시 request attribute에 ExceptionCode가 담겨 있다.")
   @Test
-  void doFilterInternalJwtException() {
+  void doFilterInternalJwtException() throws ServletException, IOException {
     MockHttpServletRequest request = new MockHttpServletRequest();
     MockHttpServletResponse response = new MockHttpServletResponse();
     MockFilterChain filterChain = new MockFilterChain();
