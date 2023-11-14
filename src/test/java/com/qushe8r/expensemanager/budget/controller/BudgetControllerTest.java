@@ -3,8 +3,7 @@ package com.qushe8r.expensemanager.budget.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
 import com.qushe8r.expensemanager.budget.dto.PostBudget;
-import com.qushe8r.expensemanager.budget.service.BudgetService;
-import com.qushe8r.expensemanager.category.dto.PostBudgetCategory;
+import com.qushe8r.expensemanager.budget.service.BudgetCreateUseCase;
 import com.qushe8r.expensemanager.config.TestSecurityConfig;
 import com.qushe8r.expensemanager.macher.MemberDetailsMatcher;
 import com.qushe8r.expensemanager.macher.PostBudgetMatcher;
@@ -36,7 +35,7 @@ class BudgetControllerTest {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private BudgetService budgetService;
+  @MockBean private BudgetCreateUseCase budgetCreateUseCase;
 
   @DisplayName("createBudget(): 입력값이 유효하면 성공한다")
   @WithMemberPrincipals
@@ -44,15 +43,13 @@ class BudgetControllerTest {
   void createBudget() throws Exception {
     // given
     Long createdBudgetId = 1L;
-    PostBudgetCategory category = new PostBudgetCategory(1L, "카테고리");
-    PostBudget postBudget = new PostBudget(100000L, YearMonth.of(2023, 8), category);
+    PostBudget postBudget = new PostBudget(100000L, YearMonth.of(2023, 8), 1L);
     String content = objectMapper.writeValueAsString(postBudget);
 
-    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "password");
-
     BDDMockito.given(
-            budgetService.createBudget(
-                Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
+            budgetCreateUseCase.createBudget(
+                Mockito.argThat(
+                    new MemberDetailsMatcher(new MemberDetails(1L, "test@email.com", "password"))),
                 Mockito.argThat(new PostBudgetMatcher(postBudget))))
         .willReturn(createdBudgetId);
 
