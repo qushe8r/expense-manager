@@ -16,7 +16,7 @@ public class BudgetMatcher implements ArgumentMatcher<Budget> {
 
   @Override
   public boolean matches(Budget right) {
-    boolean isSameId = isSameId(left, right);
+    boolean isSameId = isSameId(left.getId(), right.getId());
     boolean isSameAmount = left.getAmount().equals(right.getAmount());
     boolean isSameMonth = left.getMonth().equals(right.getMonth());
     boolean isSameMemberCategory =
@@ -25,20 +25,17 @@ public class BudgetMatcher implements ArgumentMatcher<Budget> {
   }
 
   private boolean isSameMemberCategory(MemberCategory left, MemberCategory right) {
-    boolean isSameId = isSameMemberCategoryId(left, right);
+    if (left == null && right == null) {
+      return true;
+    }
+    boolean isSameId = isSameId(left.getId(), right.getId());
     boolean isSameMember = isSameMember(left.getMember(), right.getMember());
     boolean isSameCategory = isSameCategory(left.getCategory(), right.getCategory());
     return isSameId && isSameMember && isSameCategory;
   }
 
   private boolean isSameCategory(Category left, Category right) {
-    if (left.getId() == null && right.getId() == null) {
-      return true;
-    }
-    if (left.getId() != null && right.getId() != null) {
-      return left.getId().equals(right.getId());
-    }
-    return false;
+    return isSameId(left.getId(), right.getId());
   }
 
   private boolean isSameMember(Member left, Member right) {
@@ -51,22 +48,12 @@ public class BudgetMatcher implements ArgumentMatcher<Budget> {
     return false;
   }
 
-  private boolean isSameMemberCategoryId(MemberCategory left, MemberCategory right) {
-    if (left.getId() == null && right.getId() == null) {
+  private boolean isSameId(Long left, Long right) {
+    if (left == null && right == null) {
       return true;
     }
-    if (left.getId() != null && right.getId() != null) {
-      return left.getId().equals(right.getId());
-    }
-    return false;
-  }
-
-  private boolean isSameId(Budget left, Budget right) {
-    if (left.getId() == null && right.getId() == null) {
-      return true;
-    }
-    if (left.getId() != null && right.getId() != null) {
-      return left.getId().equals(right.getId());
+    if (left != null && right != null) {
+      return left.equals(right);
     }
     return false;
   }

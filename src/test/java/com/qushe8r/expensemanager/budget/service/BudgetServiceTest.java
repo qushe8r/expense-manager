@@ -112,4 +112,54 @@ class BudgetServiceTest {
     Mockito.verify(budgetRepository, Mockito.times(1))
         .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
   }
+
+  @DisplayName("deleteBudgetIfPresent(): 조건에 맞는 예산을 찾으면 삭제한다.")
+  @Test
+  void deleteBudget() {
+    // given
+    Long budgetId = 1L;
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
+    BDDMockito.given(
+            budgetRepository.findBudgetByIdAndMemberId(
+                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+        .willReturn(Optional.empty());
+
+    // when
+    budgetService.deleteBudget(memberDetails, budgetId);
+
+    // then
+    Mockito.verify(budgetRepository, Mockito.times(1))
+        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+    Mockito.verify(budgetRepository, Mockito.times(0)).delete(Mockito.any(Budget.class));
+  }
+
+  @DisplayName("deleteBudgetIfPresent(): 조건에 맞는 예산을 찾으면 삭제한다.")
+  @Test
+  void deleteBudgetIfPresent() {
+    // given
+    Long budgetId = 1L;
+    Long amount = 150000L;
+    YearMonth month = YearMonth.of(2023, 8);
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
+    Budget budget = new Budget(1L, amount, month, null);
+    BDDMockito.given(
+            budgetRepository.findBudgetByIdAndMemberId(
+                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+        .willReturn(Optional.of(budget));
+
+    BDDMockito.doNothing()
+        .when(budgetRepository)
+        .delete(Mockito.argThat(new BudgetMatcher(budget)));
+
+    // when
+    budgetService.deleteBudget(memberDetails, budgetId);
+
+    // then
+    Mockito.verify(budgetRepository, Mockito.times(1))
+        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+    Mockito.verify(budgetRepository, Mockito.times(1))
+        .delete(Mockito.argThat(new BudgetMatcher(budget)));
+  }
 }

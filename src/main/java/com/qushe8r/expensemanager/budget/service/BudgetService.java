@@ -42,7 +42,11 @@ public class BudgetService {
   }
 
   @Transactional
-  public void deleteBudget(MemberDetails memberDetails, Long budgetId) {}
+  public void deleteBudget(MemberDetails memberDetails, Long budgetId) {
+    budgetRepository
+        .findBudgetByIdAndMemberId(memberDetails.getId(), budgetId)
+        .ifPresent(budgetRepository::delete);
+  }
 
   private void validateByMonthIfPresentThrow(PostBudget dto) {
     budgetRepository
