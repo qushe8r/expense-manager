@@ -1,4 +1,4 @@
-package com.qushe8r.expensemanager.macher;
+package com.qushe8r.expensemanager.matcher;
 
 import com.qushe8r.expensemanager.member.entity.Member;
 import org.mockito.ArgumentMatcher;

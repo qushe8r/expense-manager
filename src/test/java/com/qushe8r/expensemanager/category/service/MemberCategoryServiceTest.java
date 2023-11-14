@@ -3,7 +3,7 @@ package com.qushe8r.expensemanager.category.service;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.category.repository.MemberCategoryRepository;
-import com.qushe8r.expensemanager.macher.MemberCategoryMatcher;
+import com.qushe8r.expensemanager.matcher.MemberCategoryMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;

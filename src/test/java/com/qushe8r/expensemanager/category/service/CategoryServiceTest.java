@@ -6,7 +6,7 @@ import com.qushe8r.expensemanager.category.dto.PostCategory;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.exception.CategoryAlreadyExistException;
 import com.qushe8r.expensemanager.category.repository.CategoryRepository;
-import com.qushe8r.expensemanager.macher.CategoryMatcher;
+import com.qushe8r.expensemanager.matcher.CategoryMatcher;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;

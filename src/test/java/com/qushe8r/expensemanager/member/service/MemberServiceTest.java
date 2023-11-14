@@ -1,6 +1,6 @@
 package com.qushe8r.expensemanager.member.service;
 
-import com.qushe8r.expensemanager.macher.MemberMatcher;
+import com.qushe8r.expensemanager.matcher.MemberMatcher;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.member.exception.MemberAlreadyExistException;

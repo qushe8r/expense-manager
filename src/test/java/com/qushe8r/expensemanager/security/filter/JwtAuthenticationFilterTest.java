@@ -1,7 +1,7 @@
 package com.qushe8r.expensemanager.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qushe8r.expensemanager.macher.UsernamePasswordAuthenticationTokenMatcher;
+import com.qushe8r.expensemanager.matcher.UsernamePasswordAuthenticationTokenMatcher;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.security.dto.UsernamePassword;
 import com.qushe8r.expensemanager.security.jwt.TokenProvider;

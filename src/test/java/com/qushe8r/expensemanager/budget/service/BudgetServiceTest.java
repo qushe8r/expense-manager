@@ -6,7 +6,7 @@ import com.qushe8r.expensemanager.budget.mapper.BudgetMapper;
 import com.qushe8r.expensemanager.budget.repository.BudgetRepository;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
-import com.qushe8r.expensemanager.macher.BudgetMatcher;
+import com.qushe8r.expensemanager.matcher.BudgetMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
 import java.time.YearMonth;
 import org.assertj.core.api.Assertions;

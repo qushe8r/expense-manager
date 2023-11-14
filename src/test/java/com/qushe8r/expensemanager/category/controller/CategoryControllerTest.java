@@ -5,7 +5,7 @@ import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
 import com.qushe8r.expensemanager.category.dto.CategoryResponse;
 import com.qushe8r.expensemanager.category.dto.PostCategory;
 import com.qushe8r.expensemanager.category.service.CategoryService;
-import com.qushe8r.expensemanager.macher.PostCategoryMatcher;
+import com.qushe8r.expensemanager.matcher.PostCategoryMatcher;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
