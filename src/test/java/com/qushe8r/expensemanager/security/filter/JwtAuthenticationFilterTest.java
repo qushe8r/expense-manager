@@ -36,8 +36,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
 
-  @Spy private JwtProperties jwtProperties;
-
   @Mock private TokenProvider tokenProvider;
 
   @Spy private CookieProperties cookieProperties;
@@ -76,6 +74,11 @@ class JwtAuthenticationFilterTest {
 
     // then
     Assertions.assertThat(authentication.isAuthenticated()).isTrue();
+    Mockito.verify(authenticationManager, Mockito.times(1))
+        .authenticate(
+            Mockito.argThat(
+                new UsernamePasswordAuthenticationTokenMatcher(
+                    new UsernamePasswordAuthenticationToken("username", "password"))));
   }
 
   @DisplayName("attemptAuthentication(): 인증 성공")
@@ -102,17 +105,16 @@ class JwtAuthenticationFilterTest {
     Assertions.assertThatThrownBy(() -> filter.attemptAuthentication(req, res))
         .isInstanceOf(AuthenticationException.class);
     Mockito.verify(authenticationManager, Mockito.times(1))
-        .authenticate(Mockito.any(Authentication.class));
+        .authenticate(
+            Mockito.argThat(
+                new UsernamePasswordAuthenticationTokenMatcher(
+                    new UsernamePasswordAuthenticationToken("username", "wrong"))));
   }
 
   @DisplayName("successfulAuthentication(): 인증 성공하면 header와 cookie에 토큰을 받는다.")
   @Test
   void successfulAuthentication() {
     // given
-    jwtProperties.setSecret(JwtFactory.TEST_SECRET);
-    jwtProperties.setAccessTokenExpirationMinutes(100);
-    jwtProperties.setRefreshTokenExpirationMinutes(100);
-
     cookieProperties.setDomain("DOMAIN");
 
     MemberDetails memberDetails = new MemberDetails(1L, "username", "password");
@@ -130,6 +132,7 @@ class JwtAuthenticationFilterTest {
     BDDMockito.given(
             tokenProvider.generateRefreshToken(Mockito.anyString(), Mockito.eq("username")))
         .willReturn("REFRESH_TOKEN");
+    BDDMockito.given(tokenProvider.refreshExpirationSeconds()).willReturn(6000);
 
     // when
     filter.successfulAuthentication(
@@ -144,5 +147,10 @@ class JwtAuthenticationFilterTest {
         .hasFieldOrPropertyWithValue("HttpOnly", true)
         .hasFieldOrPropertyWithValue("Secure", true)
         .hasFieldOrPropertyWithValue("Path", "/reissue");
+    Mockito.verify(tokenProvider, Mockito.times(1))
+        .generateBearerAccessToken(Mockito.anyString(), Mockito.eq("username"), Mockito.anyMap());
+    Mockito.verify(tokenProvider, Mockito.times(1))
+        .generateRefreshToken(Mockito.anyString(), Mockito.eq("username"));
+    Mockito.verify(tokenProvider, Mockito.times(1)).refreshExpirationSeconds();
   }
 }

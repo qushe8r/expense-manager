@@ -3,7 +3,6 @@ package com.qushe8r.expensemanager.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.security.dto.UsernamePassword;
-import com.qushe8r.expensemanager.security.jwt.JwtProperties;
 import com.qushe8r.expensemanager.security.jwt.RefreshToken;
 import com.qushe8r.expensemanager.security.jwt.TokenProvider;
 import com.qushe8r.expensemanager.security.repository.RefreshTokenRepository;
@@ -26,8 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private final TokenProvider tokenProvider;
-
-  private final JwtProperties jwtProperties;
 
   private final RefreshTokenRepository refreshTokenRepository;
 
@@ -66,9 +63,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     Cookie cookie =
         CookieCreator.createCookie(
-            refreshToken,
-            cookieProperties.getDomain(),
-            jwtProperties.getRefreshTokenExpirationMinutes() * 60);
+            refreshToken, cookieProperties.getDomain(), tokenProvider.refreshExpirationSeconds());
 
     response.setHeader(HttpHeaders.AUTHORIZATION, bearerAccessToken);
     response.addCookie(cookie);

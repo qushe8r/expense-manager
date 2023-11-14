@@ -86,6 +86,10 @@ public class TokenProvider {
     return refreshTokenExpiration().getTime();
   }
 
+  public Integer refreshExpirationSeconds() {
+    return jwtProperties.getRefreshTokenExpirationMinutes() * 60;
+  }
+
   private SecretKey secretKey(String secret) {
     byte[] base64EncodedSecret =
         Base64.getEncoder().encode(secret.getBytes(StandardCharsets.UTF_8));
