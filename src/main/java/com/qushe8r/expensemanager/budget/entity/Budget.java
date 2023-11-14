@@ -53,4 +53,8 @@ public class Budget {
     this.month = month;
     this.memberCategory = memberCategory;
   }
+
+  public void modify(Long amount) {
+    this.amount = amount;
+  }
 }

@@ -1,14 +1,19 @@
 package com.qushe8r.expensemanager.budget.service;
 
+import com.qushe8r.expensemanager.budget.dto.BudgetResponse;
+import com.qushe8r.expensemanager.budget.dto.PatchBudget;
 import com.qushe8r.expensemanager.budget.dto.PostBudget;
 import com.qushe8r.expensemanager.budget.entity.Budget;
+import com.qushe8r.expensemanager.budget.exception.BudgetNotFoundException;
 import com.qushe8r.expensemanager.budget.mapper.BudgetMapper;
 import com.qushe8r.expensemanager.budget.repository.BudgetRepository;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.matcher.BudgetMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.YearMonth;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,11 +47,9 @@ class BudgetServiceTest {
     Member member = new Member(1L);
     Category category = new Category(categoryId, categoryName);
     Budget rowBudget = new Budget(amount, month, new MemberCategory(member, category));
-    Budget budget =
-        new Budget(expectedId, amount, month, new MemberCategory(member, category));
+    Budget budget = new Budget(expectedId, amount, month, new MemberCategory(member, category));
 
-    PostBudget postBudget =
-        new PostBudget(amount, month, categoryId);
+    PostBudget postBudget = new PostBudget(amount, month, categoryId);
     MemberCategory memberCategory = new MemberCategory(member, new Category(1L));
 
     BDDMockito.given(budgetRepository.save(Mockito.argThat(new BudgetMatcher(rowBudget))))
@@ -59,5 +62,54 @@ class BudgetServiceTest {
     Assertions.assertThat(budgetId).isEqualTo(expectedId);
     Mockito.verify(budgetRepository, Mockito.times(1))
         .save(Mockito.argThat(new BudgetMatcher(rowBudget)));
+  }
+
+  @DisplayName("modifyBudget(): 예산 수정이 완료되면 budgetResponse(dto)를 응답한다.")
+  @Test
+  void modifyBudget() {
+    // given
+    Long budgetId = 1L;
+    Long amount = 150000L;
+    YearMonth month = YearMonth.of(2023, 8);
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+    PatchBudget patchBudget = new PatchBudget(amount);
+
+    BDDMockito.given(
+            budgetRepository.findBudgetByIdAndMemberId(
+                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+        .willReturn(Optional.of(new Budget(budgetId, amount, month, null)));
+
+    // when
+    BudgetResponse response = budgetService.modifyBudget(memberDetails, budgetId, patchBudget);
+
+    // then
+    Assertions.assertThat(response)
+        .hasFieldOrPropertyWithValue("budgetId", budgetId)
+        .hasFieldOrPropertyWithValue("amount", amount)
+        .hasFieldOrPropertyWithValue("month", month);
+    Mockito.verify(budgetRepository, Mockito.times(1))
+        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+  }
+
+  @DisplayName("modifyBudgetBudgetNotFoundException(): 예산을 찾을 수 없습니다. 예외가 발생한다.")
+  @Test
+  void modifyBudgetBudgetNotFoundException() {
+    // given
+    Long budgetId = 1L;
+    Long amount = 150000L;
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+    PatchBudget patchBudget = new PatchBudget(amount);
+
+    BDDMockito.given(
+            budgetRepository.findBudgetByIdAndMemberId(
+                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+        .willReturn(Optional.empty());
+
+    // when & then
+    Assertions.assertThatThrownBy(
+            () -> budgetService.modifyBudget(memberDetails, budgetId, patchBudget))
+        .isInstanceOf(BudgetNotFoundException.class);
+    Mockito.verify(budgetRepository, Mockito.times(1))
+        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
   }
 }
