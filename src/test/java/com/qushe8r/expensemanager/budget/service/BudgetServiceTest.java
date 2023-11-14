@@ -4,6 +4,7 @@ import com.qushe8r.expensemanager.budget.dto.BudgetResponse;
 import com.qushe8r.expensemanager.budget.dto.PatchBudget;
 import com.qushe8r.expensemanager.budget.dto.PostBudget;
 import com.qushe8r.expensemanager.budget.entity.Budget;
+import com.qushe8r.expensemanager.budget.exception.BudgetAlreadyExistsException;
 import com.qushe8r.expensemanager.budget.exception.BudgetNotFoundException;
 import com.qushe8r.expensemanager.budget.mapper.BudgetMapper;
 import com.qushe8r.expensemanager.budget.repository.BudgetRepository;
@@ -62,6 +63,34 @@ class BudgetServiceTest {
     Assertions.assertThat(budgetId).isEqualTo(expectedId);
     Mockito.verify(budgetRepository, Mockito.times(1))
         .save(Mockito.argThat(new BudgetMatcher(rowBudget)));
+  }
+
+  @DisplayName("createBudgetBudgetAlreadyExistsException(): 이미 예산이 존재하면 예외가 발생한다.")
+  @Test
+  void createBudgetBudgetAlreadyExistsException() {
+    // given
+    Long expectedId = 1L;
+    Long categoryId = 1L;
+    String categoryName = "카테고리";
+    Long amount = 100000L;
+    YearMonth month = YearMonth.of(2023, 11);
+
+    Member member = new Member(1L);
+    Category category = new Category(categoryId, categoryName);
+    Budget rowBudget = new Budget(amount, month, new MemberCategory(member, category));
+    Budget budget = new Budget(expectedId, amount, month, new MemberCategory(member, category));
+
+    PostBudget postBudget = new PostBudget(amount, month, categoryId);
+    MemberCategory memberCategory = new MemberCategory(member, new Category(1L));
+
+    BDDMockito.given(budgetRepository.findByMonth(Mockito.eq(month)))
+        .willReturn(Optional.of(budget));
+
+    // when
+    Assertions.assertThatThrownBy(() -> budgetService.createBudget(memberCategory, postBudget))
+        .isInstanceOf(BudgetAlreadyExistsException.class);
+    Mockito.verify(budgetRepository, Mockito.times(1)).findByMonth(Mockito.eq(month));
+    Mockito.verify(budgetRepository, Mockito.times(0)).save(Mockito.any(Budget.class));
   }
 
   @DisplayName("modifyBudget(): 예산 수정이 완료되면 budgetResponse(dto)를 응답한다.")
