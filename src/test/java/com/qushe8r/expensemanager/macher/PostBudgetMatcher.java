@@ -15,13 +15,7 @@ public class PostBudgetMatcher implements ArgumentMatcher<PostBudget> {
   public boolean matches(PostBudget right) {
     boolean isSameBudget = left.budget().equals(right.budget());
     boolean isSameMonth = left.month().equals(right.month());
-    boolean isSameCategory = isSameCategory(left, right);
+    boolean isSameCategory = left.categoryId().equals(right.categoryId());
     return isSameBudget && isSameMonth && isSameCategory;
-  }
-
-  private boolean isSameCategory(PostBudget left, PostBudget right) {
-    boolean isSameCategoryId = left.category().id().equals(right.category().id());
-    boolean isSameCategoryName = left.category().name().equals(right.category().name());
-    return isSameCategoryId && isSameCategoryName;
   }
 }
