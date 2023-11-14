@@ -5,6 +5,7 @@ import com.qushe8r.expensemanager.category.dto.CategoryResponse;
 import com.qushe8r.expensemanager.category.dto.PostCategory;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.exception.CategoryAlreadyExistException;
+import com.qushe8r.expensemanager.category.exception.CategoryNotFoundException;
 import com.qushe8r.expensemanager.category.repository.CategoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,9 @@ public class CategoryService {
 
   private final CategoryRepository categoryRepository;
 
+  @Transactional
   public Long crateCategory(PostCategory dto) {
-    validateCategoryExistByName(dto.name());
+    validateCategoryByNameIfPresentThrow(dto.name());
     Category rowCategory = categoryMapper.toEntity(dto);
     Category category = categoryRepository.save(rowCategory);
     return category.getId();
@@ -32,12 +34,16 @@ public class CategoryService {
     return categoryMapper.toResponse(categories);
   }
 
-  private void validateCategoryExistByName(String name) {
+  private void validateCategoryByNameIfPresentThrow(String name) {
     categoryRepository
         .findByName(name)
         .ifPresent(
             category -> {
               throw new CategoryAlreadyExistException();
             });
+  }
+
+  public Category validateCategoryByIdOrElseThrow(Long categoryId) {
+    return categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
   }
 }

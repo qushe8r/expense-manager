@@ -1,4 +1,4 @@
-package com.qushe8r.expensemanager.macher;
+package com.qushe8r.expensemanager.matcher;
 
 import org.mockito.ArgumentMatcher;
 import org.springframework.security.core.Authentication;

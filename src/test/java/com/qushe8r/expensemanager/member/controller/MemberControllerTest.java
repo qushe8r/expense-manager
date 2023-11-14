@@ -2,7 +2,7 @@ package com.qushe8r.expensemanager.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
-import com.qushe8r.expensemanager.macher.PostMemberMatcher;
+import com.qushe8r.expensemanager.matcher.PostMemberMatcher;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
