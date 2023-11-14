@@ -4,4 +4,4 @@ import jakarta.validation.constraints.NotNull;
 import java.time.YearMonth;
 
 public record PostBudget(
-    @NotNull Long budget, @NotNull YearMonth month, @NotNull Long categoryId) {}
+    @NotNull Long amount, @NotNull YearMonth month, @NotNull Long categoryId) {}

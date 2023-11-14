@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 public class BudgetMapper {
 
   public Budget toEntity(MemberCategory memberCategory, PostBudget dto) {
-    return new Budget(dto.budget(), dto.month(), memberCategory);
+    return new Budget(dto.amount(), dto.month(), memberCategory);
   }
 }

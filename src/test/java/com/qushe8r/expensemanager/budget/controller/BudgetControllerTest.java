@@ -94,7 +94,7 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.status").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("budget"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("amount"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 
