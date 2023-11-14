@@ -267,4 +267,30 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("amount"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
+
+  @DisplayName("deleteBudget(): 정상적으로 삭제되면 noContent 상태코드만 응답한다.")
+  @WithMemberPrincipals
+  @Test
+  void deleteBudget() throws Exception {
+    // given
+    Long budgetId = 1L;
+
+    BDDMockito.doNothing()
+        .when(budgetService)
+        .deleteBudget(
+            Mockito.argThat(new MemberDetailsMatcher(new MemberDetails(1L, "test@email.com", ""))),
+            Mockito.eq(budgetId));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
 }

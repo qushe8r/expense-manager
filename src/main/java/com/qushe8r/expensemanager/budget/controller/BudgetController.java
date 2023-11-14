@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,5 +48,12 @@ public class BudgetController {
       @RequestBody @Validated PatchBudget dto) {
     BudgetResponse response = budgetService.modifyBudget(memberDetails, budgetId, dto);
     return ResponseEntity.ok(new SingleResponse<>(response));
+  }
+
+  @DeleteMapping("/{budgetId}")
+  public ResponseEntity<Void> deleteBudget(
+      @AuthenticationPrincipal MemberDetails memberDetails, @PathVariable Long budgetId) {
+    budgetService.deleteBudget(memberDetails, budgetId);
+    return ResponseEntity.noContent().build();
   }
 }

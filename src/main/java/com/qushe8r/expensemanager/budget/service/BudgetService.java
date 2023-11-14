@@ -31,15 +31,6 @@ public class BudgetService {
     return budget.getId();
   }
 
-  private void validateByMonthIfPresentThrow(PostBudget dto) {
-    budgetRepository
-        .findByMonth(dto.month())
-        .ifPresent(
-            budget -> {
-              throw new BudgetAlreadyExistsException();
-            });
-  }
-
   @Transactional
   public BudgetResponse modifyBudget(MemberDetails memberDetails, Long budgetId, PatchBudget dto) {
     Budget budget =
@@ -48,5 +39,17 @@ public class BudgetService {
             .orElseThrow(BudgetNotFoundException::new);
     budget.modify(dto.amount());
     return budgetMapper.toResponse(budget);
+  }
+
+  @Transactional
+  public void deleteBudget(MemberDetails memberDetails, Long budgetId) {}
+
+  private void validateByMonthIfPresentThrow(PostBudget dto) {
+    budgetRepository
+        .findByMonth(dto.month())
+        .ifPresent(
+            budget -> {
+              throw new BudgetAlreadyExistsException();
+            });
   }
 }
