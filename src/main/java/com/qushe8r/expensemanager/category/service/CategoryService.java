@@ -20,6 +20,7 @@ public class CategoryService {
 
   private final CategoryRepository categoryRepository;
 
+  @Transactional
   public Long crateCategory(PostCategory dto) {
     validateCategoryExistByName(dto.name());
     Category rowCategory = categoryMapper.toEntity(dto);
