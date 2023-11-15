@@ -77,7 +77,6 @@ class BudgetServiceTest {
 
     Member member = new Member(1L);
     Category category = new Category(categoryId, categoryName);
-    Budget rowBudget = new Budget(amount, month, new MemberCategory(member, category));
     Budget budget = new Budget(expectedId, amount, month, new MemberCategory(member, category));
 
     PostBudget postBudget = new PostBudget(amount, month, categoryId);
