@@ -70,7 +70,7 @@ class ExpenseUpdateUseCaseTest {
         .hasFieldOrPropertyWithValue("expenseAt", expenseAt)
         .hasFieldOrPropertyWithValue("categoryName", categoryName);
     Mockito.verify(memberCategoryService, Mockito.times(1))
-        .findByMemberCategoryOrElseSave(Mockito.eq(memberId), Mockito.eq(categoryId));
+        .findByMemberCategoryOrElseSave(memberId, categoryId);
     Mockito.verify(expenseService, Mockito.times(1))
         .modifyExpense(
             Mockito.argThat(new MemberCategoryMatcher(membercategory)),

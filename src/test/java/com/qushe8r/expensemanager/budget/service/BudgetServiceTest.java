@@ -82,13 +82,12 @@ class BudgetServiceTest {
     PostBudget postBudget = new PostBudget(amount, month, categoryId);
     MemberCategory memberCategory = new MemberCategory(member, new Category(1L));
 
-    BDDMockito.given(budgetRepository.findByMonth(Mockito.eq(month)))
-        .willReturn(Optional.of(budget));
+    BDDMockito.given(budgetRepository.findByMonth(month)).willReturn(Optional.of(budget));
 
     // when
     Assertions.assertThatThrownBy(() -> budgetService.createBudget(memberCategory, postBudget))
         .isInstanceOf(BudgetAlreadyExistsException.class);
-    Mockito.verify(budgetRepository, Mockito.times(1)).findByMonth(Mockito.eq(month));
+    Mockito.verify(budgetRepository, Mockito.times(1)).findByMonth(month);
     Mockito.verify(budgetRepository, Mockito.times(0)).save(Mockito.any(Budget.class));
   }
 
@@ -102,9 +101,7 @@ class BudgetServiceTest {
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
     PatchBudget patchBudget = new PatchBudget(amount);
 
-    BDDMockito.given(
-            budgetRepository.findBudgetByIdAndMemberId(
-                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+    BDDMockito.given(budgetRepository.findBudgetByIdAndMemberId(memberDetails.getId(), budgetId))
         .willReturn(Optional.of(new Budget(budgetId, amount, month, null)));
 
     // when
@@ -116,7 +113,7 @@ class BudgetServiceTest {
         .hasFieldOrPropertyWithValue("amount", amount)
         .hasFieldOrPropertyWithValue("month", month);
     Mockito.verify(budgetRepository, Mockito.times(1))
-        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+        .findBudgetByIdAndMemberId(memberDetails.getId(), budgetId);
   }
 
   @DisplayName("modifyBudgetBudgetNotFoundException(): 예산을 찾을 수 없습니다. 예외가 발생한다.")
@@ -128,9 +125,7 @@ class BudgetServiceTest {
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
     PatchBudget patchBudget = new PatchBudget(amount);
 
-    BDDMockito.given(
-            budgetRepository.findBudgetByIdAndMemberId(
-                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+    BDDMockito.given(budgetRepository.findBudgetByIdAndMemberId(memberDetails.getId(), budgetId))
         .willReturn(Optional.empty());
 
     // when & then
@@ -138,7 +133,7 @@ class BudgetServiceTest {
             () -> budgetService.modifyBudget(memberDetails, budgetId, patchBudget))
         .isInstanceOf(BudgetNotFoundException.class);
     Mockito.verify(budgetRepository, Mockito.times(1))
-        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+        .findBudgetByIdAndMemberId(memberDetails.getId(), budgetId);
   }
 
   @DisplayName("deleteBudgetIfPresent(): 조건에 맞는 예산을 찾으면 삭제한다.")
@@ -148,9 +143,7 @@ class BudgetServiceTest {
     Long budgetId = 1L;
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
-    BDDMockito.given(
-            budgetRepository.findBudgetByIdAndMemberId(
-                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+    BDDMockito.given(budgetRepository.findBudgetByIdAndMemberId(memberDetails.getId(), budgetId))
         .willReturn(Optional.empty());
 
     // when
@@ -158,7 +151,7 @@ class BudgetServiceTest {
 
     // then
     Mockito.verify(budgetRepository, Mockito.times(1))
-        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+        .findBudgetByIdAndMemberId(memberDetails.getId(), budgetId);
     Mockito.verify(budgetRepository, Mockito.times(0)).delete(Mockito.any(Budget.class));
   }
 
@@ -172,9 +165,7 @@ class BudgetServiceTest {
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
     Budget budget = new Budget(1L, amount, month, null);
-    BDDMockito.given(
-            budgetRepository.findBudgetByIdAndMemberId(
-                Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId)))
+    BDDMockito.given(budgetRepository.findBudgetByIdAndMemberId(memberDetails.getId(), budgetId))
         .willReturn(Optional.of(budget));
 
     BDDMockito.doNothing()
@@ -186,7 +177,7 @@ class BudgetServiceTest {
 
     // then
     Mockito.verify(budgetRepository, Mockito.times(1))
-        .findBudgetByIdAndMemberId(Mockito.eq(memberDetails.getId()), Mockito.eq(budgetId));
+        .findBudgetByIdAndMemberId(memberDetails.getId(), budgetId);
     Mockito.verify(budgetRepository, Mockito.times(1))
         .delete(Mockito.argThat(new BudgetMatcher(budget)));
   }

@@ -2,20 +2,16 @@ package com.qushe8r.expensemanager.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
-import com.qushe8r.expensemanager.category.entity.Category;
-import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.config.TestSecurityConfig;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
-import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.expense.service.ExpenseCreateUseCase;
 import com.qushe8r.expensemanager.expense.service.ExpenseService;
 import com.qushe8r.expensemanager.expense.service.ExpenseUpdateUseCase;
 import com.qushe8r.expensemanager.matcher.MemberDetailsMatcher;
 import com.qushe8r.expensemanager.matcher.PatchExpenseMatcher;
 import com.qushe8r.expensemanager.matcher.PostExpenseMatcher;
-import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
@@ -242,9 +238,7 @@ class ExpenseControllerTest {
     Long expenseId = 1L;
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
-    BDDMockito.doNothing()
-        .when(expenseService)
-        .deleteExpense(memberDetails.getId(), expenseId);
+    BDDMockito.doNothing().when(expenseService).deleteExpense(memberDetails.getId(), expenseId);
 
     // when
     ResultActions actions =

@@ -138,9 +138,7 @@ class ExpenseServiceTest {
     Expense expense =
         new Expense(1L, 10000L, "돼지국밥", LocalDateTime.of(2023, 11, 15, 12, 0), memberCategory);
 
-    BDDMockito.given(
-            expenseRepository.findByMemberIdAndExpenseId(
-                Mockito.eq(memberId), Mockito.eq(expenseId)))
+    BDDMockito.given(expenseRepository.findByMemberIdAndExpenseId(memberId, expenseId))
         .willReturn(Optional.of(expense));
 
     BDDMockito.doNothing().when(expenseRepository).delete(expense);
@@ -148,7 +146,7 @@ class ExpenseServiceTest {
     // when
     expenseService.deleteExpense(memberId, expenseId);
     Mockito.verify(expenseRepository, Mockito.times(1))
-        .findByMemberIdAndExpenseId(Mockito.eq(memberId), Mockito.eq(expenseId));
+        .findByMemberIdAndExpenseId(memberId, expenseId);
     Mockito.verify(expenseRepository, Mockito.times(1)).delete(expense);
   }
 
@@ -160,9 +158,7 @@ class ExpenseServiceTest {
     Long memberId = 1L;
     Long expenseId = 5L;
 
-    BDDMockito.given(
-            expenseRepository.findByMemberIdAndExpenseId(
-                Mockito.eq(memberId), Mockito.eq(expenseId)))
+    BDDMockito.given(expenseRepository.findByMemberIdAndExpenseId(memberId, expenseId))
         .willReturn(Optional.empty());
 
     // when
@@ -170,7 +166,7 @@ class ExpenseServiceTest {
 
     // then
     Mockito.verify(expenseRepository, Mockito.times(1))
-        .findByMemberIdAndExpenseId(Mockito.eq(memberId), Mockito.eq(expenseId));
+        .findByMemberIdAndExpenseId(memberId, expenseId);
     Mockito.verify(expenseRepository, Mockito.times(0)).delete(Mockito.any(Expense.class));
   }
 }

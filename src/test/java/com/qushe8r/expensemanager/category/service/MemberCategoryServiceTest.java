@@ -111,11 +111,11 @@ class MemberCategoryServiceTest {
 
     BDDMockito.given(
             memberCategoryRepository.findCategoriesByAmountRangeAndDateRange(
-                Mockito.eq(memberDetails.getId()),
-                Mockito.eq(start.atTime(LocalTime.MIN)),
-                Mockito.eq(end.atTime(LocalTime.MAX)),
-                Mockito.eq(min),
-                Mockito.eq(max)))
+                memberDetails.getId(),
+                start.atTime(LocalTime.MIN),
+                end.atTime(LocalTime.MAX),
+                min,
+                max))
         .willReturn(List.of(memberCategory));
 
     // when
@@ -141,11 +141,11 @@ class MemberCategoryServiceTest {
         .hasFieldOrPropertyWithValue("expenseAt", expenseAt);
     Mockito.verify(memberCategoryRepository, Mockito.times(1))
         .findCategoriesByAmountRangeAndDateRange(
-            Mockito.eq(memberDetails.getId()),
-            Mockito.eq(start.atTime(LocalTime.MIN)),
-            Mockito.eq(end.atTime(LocalTime.MAX)),
-            Mockito.eq(min),
-            Mockito.eq(max));
+            memberDetails.getId(),
+            start.atTime(LocalTime.MIN),
+            end.atTime(LocalTime.MAX),
+            min,
+            max);
   }
 
   @DisplayName("getCategorizedExpenseValidateEndBeforeStartException(): 날자 유효성 검사 실패")
