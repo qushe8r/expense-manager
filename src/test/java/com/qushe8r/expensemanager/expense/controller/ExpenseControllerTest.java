@@ -167,7 +167,6 @@ class ExpenseControllerTest {
     Long amount = 10000L;
     String memo = "돼지국밥";
     LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
-    ;
     Long categoryId = null;
 
     PostExpense postExpense = new PostExpense(amount, memo, expenseAt, categoryId);
@@ -211,14 +210,6 @@ class ExpenseControllerTest {
 
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
-    Expense expense =
-        new Expense(
-            expenseId,
-            amount,
-            memo,
-            expenseAt,
-            new MemberCategory(1L, new Member(1L), new Category(1L)));
-
     BDDMockito.given(
             expenseUpdateUseCase.modifyExpense(
                 Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
@@ -240,7 +231,6 @@ class ExpenseControllerTest {
         .modifyExpense(
             Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
             Mockito.eq(expenseId),
-            //            Mockito.argThat(new ExpenseMatcher(expense)),
             Mockito.argThat(new PatchExpenseMatcher(patchExpense)));
   }
 
