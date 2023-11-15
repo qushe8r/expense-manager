@@ -2,7 +2,6 @@ package com.qushe8r.expensemanager.budget.entity;
 
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.common.converter.YearMonthAttributeConverter;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -37,7 +36,7 @@ public class Budget {
   @Convert(converter = YearMonthAttributeConverter.class)
   private YearMonth month;
 
-  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_category_id")
   private MemberCategory memberCategory;
 
