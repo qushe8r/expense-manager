@@ -1,10 +1,13 @@
 package com.qushe8r.expensemanager.expense.service;
 
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
+import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.expense.mapper.ExpenseMapper;
 import com.qushe8r.expensemanager.expense.repository.ExpenseRepository;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,5 +25,10 @@ public class ExpenseService {
     Expense rowBudget = expenseMapper.toEntity(memberCategory, dto);
     Expense budget = expenseRepository.save(rowBudget);
     return budget.getId();
+  }
+
+  public ExpenseResponse modifyExpense(
+      MemberDetails memberDetails, Long expenseId, PatchExpense dto) {
+    return null;
   }
 }
