@@ -76,7 +76,9 @@ class ExpenseControllerTest {
             MockMvcResultMatchers.header()
                 .string(HttpHeaders.LOCATION, EXPENSE_DEFAULT_URL + "/" + createdExpenseId));
     Mockito.verify(expenseCreateUseCase, Mockito.times(1))
-        .createExpense(Mockito.argThat(new MemberDetailsMatcher(memberDetails)),Mockito.argThat(new PostExpenseMatcher(postExpense)));
+        .createExpense(
+            Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
+            Mockito.argThat(new PostExpenseMatcher(postExpense)));
   }
 
   @DisplayName("createExpenseAmountNull(): amount가 null이면 400 BadRequest 응답한다.")

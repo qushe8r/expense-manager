@@ -37,4 +37,20 @@ public class Expense {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_category_id")
   private MemberCategory memberCategory;
+
+  public Expense(Long id, Long amount, String memo, LocalDateTime expenseAt,
+      MemberCategory memberCategory) {
+    this.id = id;
+    this.amount = amount;
+    this.memo = memo;
+    this.expenseAt = expenseAt;
+    this.memberCategory = memberCategory;
+  }
+
+  public Expense(Long amount, String memo, LocalDateTime expenseAt, MemberCategory memberCategory) {
+    this.amount = amount;
+    this.memo = memo;
+    this.expenseAt = expenseAt;
+    this.memberCategory = memberCategory;
+  }
 }
