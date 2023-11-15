@@ -243,4 +243,69 @@ class ExpenseControllerTest {
             //            Mockito.argThat(new ExpenseMatcher(expense)),
             Mockito.argThat(new PatchExpenseMatcher(patchExpense)));
   }
+
+  @DisplayName("deleteExpense(): 입력값이 유효하면 204 NoContent 응답한다.")
+  @WithMemberPrincipals
+  @Test
+  void deleteExpense() throws Exception {
+    // given
+    Long expenseId = 1L;
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
+    BDDMockito.doNothing()
+        .when(expenseService)
+        .deleteExpense(memberDetails.getId(), expenseId);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+    Mockito.verify(expenseService, Mockito.times(1))
+        .deleteExpense(memberDetails.getId(), expenseId);
+  }
+
+  @DisplayName("deleteExpenseExpenseIdNotPositive(): expenseId가 양의 정수가 아니면 유효성 검증 실패한다.")
+  @WithMemberPrincipals
+  @Test
+  void deleteExpenseExpenseIdNotPositive() throws Exception {
+    // given
+    Long expenseId = 0L;
+
+    BDDMockito.doNothing().when(expenseService).deleteExpense(Mockito.anyLong(), Mockito.anyLong());
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isArray())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors[0].propertyPath").isString())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors[0].rejectedValue").isString())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors[0].reason").isString())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.violationErrors[0].rejectedValue")
+                .value(String.valueOf(expenseId)))
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.violationErrors[0].propertyPath")
+                .value("deleteExpense.expenseId"));
+    Mockito.verify(expenseService, Mockito.times(0))
+        .deleteExpense(Mockito.anyLong(), Mockito.anyLong());
+  }
 }
