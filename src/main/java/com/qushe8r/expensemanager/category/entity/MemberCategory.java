@@ -56,4 +56,11 @@ public class MemberCategory {
     this.member = member;
     this.category = category;
   }
+
+  public MemberCategory(Long id, Member member, Category category, List<Expense> expenses) {
+    this.id = id;
+    this.member = member;
+    this.category = category;
+    this.expenses = expenses;
+  }
 }

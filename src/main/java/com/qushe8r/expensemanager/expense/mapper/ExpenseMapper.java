@@ -1,6 +1,7 @@
 package com.qushe8r.expensemanager.expense.mapper;
 
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.expense.dto.CategorylessExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.entity.Expense;
@@ -20,5 +21,10 @@ public class ExpenseMapper {
         expense.getMemo(),
         expense.getExpenseAt(),
         expense.getMemberCategory().getCategory().getName());
+  }
+
+  public static CategorylessExpenseResponse toCategorylessExpenseResponse(Expense expense) {
+    return new CategorylessExpenseResponse(
+        expense.getId(), expense.getAmount(), expense.getMemo(), expense.getExpenseAt());
   }
 }
