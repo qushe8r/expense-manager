@@ -2,15 +2,20 @@ package com.qushe8r.expensemanager.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
+import com.qushe8r.expensemanager.category.entity.Category;
+import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.config.TestSecurityConfig;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
+import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.expense.service.ExpenseCreateUseCase;
 import com.qushe8r.expensemanager.expense.service.ExpenseService;
+import com.qushe8r.expensemanager.expense.service.ExpenseUpdateUseCase;
 import com.qushe8r.expensemanager.matcher.MemberDetailsMatcher;
 import com.qushe8r.expensemanager.matcher.PatchExpenseMatcher;
 import com.qushe8r.expensemanager.matcher.PostExpenseMatcher;
+import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +47,8 @@ class ExpenseControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private ExpenseCreateUseCase expenseCreateUseCase;
+
+  @MockBean private ExpenseUpdateUseCase expenseUpdateUseCase;
 
   @MockBean private ExpenseService expenseService;
 
@@ -204,8 +211,16 @@ class ExpenseControllerTest {
 
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
+    Expense expense =
+        new Expense(
+            expenseId,
+            amount,
+            memo,
+            expenseAt,
+            new MemberCategory(1L, new Member(1L), new Category(1L)));
+
     BDDMockito.given(
-            expenseService.modifyExpense(
+            expenseUpdateUseCase.modifyExpense(
                 Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
                 Mockito.eq(expenseId),
                 Mockito.argThat(new PatchExpenseMatcher(patchExpense))))
@@ -221,10 +236,11 @@ class ExpenseControllerTest {
 
     // then
     actions.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk());
-    Mockito.verify(expenseService, Mockito.times(1))
+    Mockito.verify(expenseUpdateUseCase, Mockito.times(1))
         .modifyExpense(
             Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
             Mockito.eq(expenseId),
+            //            Mockito.argThat(new ExpenseMatcher(expense)),
             Mockito.argThat(new PatchExpenseMatcher(patchExpense)));
   }
 }

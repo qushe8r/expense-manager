@@ -6,7 +6,7 @@ import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.service.ExpenseCreateUseCase;
-import com.qushe8r.expensemanager.expense.service.ExpenseService;
+import com.qushe8r.expensemanager.expense.service.ExpenseUpdateUseCase;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class ExpenseController {
 
   private final ExpenseCreateUseCase expenseCreateUseCase;
 
-  private final ExpenseService expenseService;
+  private final ExpenseUpdateUseCase expenseUpdateUseCase;
 
   @PostMapping
   public ResponseEntity<Void> createExpense(
@@ -45,7 +45,7 @@ public class ExpenseController {
       @AuthenticationPrincipal MemberDetails memberDetails,
       @PathVariable Long expenseId,
       @RequestBody PatchExpense dto) {
-    ExpenseResponse response = expenseService.modifyExpense(memberDetails, expenseId, dto);
+    ExpenseResponse response = expenseUpdateUseCase.modifyExpense(memberDetails, expenseId, dto);
     return ResponseEntity.ok(new SingleResponse<>(response));
   }
 }

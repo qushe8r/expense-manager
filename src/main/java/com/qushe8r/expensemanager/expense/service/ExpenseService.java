@@ -7,7 +7,6 @@ import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.expense.mapper.ExpenseMapper;
 import com.qushe8r.expensemanager.expense.repository.ExpenseRepository;
-import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +26,9 @@ public class ExpenseService {
     return budget.getId();
   }
 
+  @Transactional
   public ExpenseResponse modifyExpense(
-      MemberDetails memberDetails, Long expenseId, PatchExpense dto) {
+      MemberCategory memberCategory, Long expenseId, PatchExpense dto) {
     return null;
   }
 }
