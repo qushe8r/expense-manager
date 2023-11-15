@@ -37,4 +37,11 @@ public class ExpenseService {
     expense.modify(dto, memberCategory);
     return expenseMapper.toResponse(expense);
   }
+
+  @Transactional
+  public void deleteExpense(Long memberId, Long expenseId) {
+    expenseRepository
+        .findByMemberIdAndExpenseId(memberId, expenseId)
+        .ifPresent(expenseRepository::delete);
+  }
 }

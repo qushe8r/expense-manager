@@ -1,5 +1,6 @@
 package com.qushe8r.expensemanager.expense.service;
 
+import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
@@ -123,5 +124,53 @@ class ExpenseServiceTest {
     Assertions.assertThatThrownBy(
             () -> expenseService.modifyExpense(memberCategory, expenseId, patchExpense))
         .isInstanceOf(ExpenseNotFoundException.class);
+  }
+
+  @DisplayName("deleteExpense(): 입력값이 유효하면 삭제한다.")
+  @WithMemberPrincipals
+  @Test
+  void deleteExpense() {
+    // given
+    Long memberId = 1L;
+    Long expenseId = 5L;
+
+    MemberCategory memberCategory = new MemberCategory(3L, new Member(memberId), new Category(4L));
+    Expense expense =
+        new Expense(1L, 10000L, "돼지국밥", LocalDateTime.of(2023, 11, 15, 12, 0), memberCategory);
+
+    BDDMockito.given(
+            expenseRepository.findByMemberIdAndExpenseId(
+                Mockito.eq(memberId), Mockito.eq(expenseId)))
+        .willReturn(Optional.of(expense));
+
+    BDDMockito.doNothing().when(expenseRepository).delete(expense);
+
+    // when
+    expenseService.deleteExpense(memberId, expenseId);
+    Mockito.verify(expenseRepository, Mockito.times(1))
+        .findByMemberIdAndExpenseId(Mockito.eq(memberId), Mockito.eq(expenseId));
+    Mockito.verify(expenseRepository, Mockito.times(1)).delete(expense);
+  }
+
+  @DisplayName("deleteExpenseDoNoting(): 입력값이 유효하지 않으면 아무것도 하지 않는다.")
+  @WithMemberPrincipals
+  @Test
+  void deleteExpenseDoNoting() {
+    // given
+    Long memberId = 1L;
+    Long expenseId = 5L;
+
+    BDDMockito.given(
+            expenseRepository.findByMemberIdAndExpenseId(
+                Mockito.eq(memberId), Mockito.eq(expenseId)))
+        .willReturn(Optional.empty());
+
+    // when
+    expenseService.deleteExpense(memberId, expenseId);
+
+    // then
+    Mockito.verify(expenseRepository, Mockito.times(1))
+        .findByMemberIdAndExpenseId(Mockito.eq(memberId), Mockito.eq(expenseId));
+    Mockito.verify(expenseRepository, Mockito.times(0)).delete(Mockito.any(Expense.class));
   }
 }
