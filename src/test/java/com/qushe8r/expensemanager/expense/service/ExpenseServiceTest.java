@@ -2,13 +2,17 @@ package com.qushe8r.expensemanager.expense.service;
 
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
+import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.entity.Expense;
+import com.qushe8r.expensemanager.expense.exception.ExpenseNotFoundException;
 import com.qushe8r.expensemanager.expense.mapper.ExpenseMapper;
 import com.qushe8r.expensemanager.expense.repository.ExpenseRepository;
 import com.qushe8r.expensemanager.matcher.ExpenseMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,5 +62,66 @@ class ExpenseServiceTest {
     Assertions.assertThat(budgetId).isEqualTo(expectedId);
     Mockito.verify(expenseRepository, Mockito.times(1))
         .save(Mockito.argThat(new ExpenseMatcher(rowExpense)));
+  }
+
+  @DisplayName("modifyExpense(): 수정에 성공하면 수정된 정보를 응답한다.")
+  @Test
+  void modifyExpense() {
+    // given
+    Long expenseId = 1L;
+    Long categoryId = 1L;
+    Long amount = 12000L;
+    String memo = "김치찌개";
+    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
+    String categoryName = "카테고리";
+
+    MemberCategory memberCategory =
+        new MemberCategory(categoryId, new Member(1L), new Category(1L, categoryName));
+    PatchExpense patchExpense = new PatchExpense(amount, memo, expenseAt, categoryId);
+
+    BDDMockito.given(expenseRepository.findExpenseMemberCategoryById(expenseId))
+        .willReturn(
+            Optional.of(
+                new Expense(
+                    expenseId,
+                    10000L,
+                    "돼지국밥",
+                    LocalDateTime.of(2023, 11, 13, 12, 0),
+                    memberCategory)));
+
+    // when
+    ExpenseResponse result = expenseService.modifyExpense(memberCategory, expenseId, patchExpense);
+
+    // then
+    Assertions.assertThat(result)
+        .hasFieldOrPropertyWithValue("expenseId", expenseId)
+        .hasFieldOrPropertyWithValue("amount", amount)
+        .hasFieldOrPropertyWithValue("memo", memo)
+        .hasFieldOrPropertyWithValue("expenseAt", expenseAt)
+        .hasFieldOrPropertyWithValue("categoryName", categoryName);
+  }
+
+  @DisplayName("modifyExpenseExpenseNotFoundException(): 지출이 없으면 ExpenseNotFoundException이 발생한다.")
+  @Test
+  void modifyExpenseExpenseNotFoundException() {
+    // given
+    Long expenseId = 1L;
+    Long categoryId = 1L;
+    Long amount = 12000L;
+    String memo = "김치찌개";
+    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
+    String categoryName = "카테고리";
+
+    MemberCategory memberCategory =
+        new MemberCategory(categoryId, new Member(1L), new Category(1L, categoryName));
+    PatchExpense patchExpense = new PatchExpense(amount, memo, expenseAt, categoryId);
+
+    BDDMockito.given(expenseRepository.findExpenseMemberCategoryById(expenseId))
+        .willReturn(Optional.empty());
+
+    // when
+    Assertions.assertThatThrownBy(
+            () -> expenseService.modifyExpense(memberCategory, expenseId, patchExpense))
+        .isInstanceOf(ExpenseNotFoundException.class);
   }
 }

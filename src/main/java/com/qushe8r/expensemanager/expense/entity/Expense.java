@@ -1,6 +1,7 @@
 package com.qushe8r.expensemanager.expense.entity;
 
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,8 +39,8 @@ public class Expense {
   @JoinColumn(name = "member_category_id")
   private MemberCategory memberCategory;
 
-  public Expense(Long id, Long amount, String memo, LocalDateTime expenseAt,
-      MemberCategory memberCategory) {
+  public Expense(
+      Long id, Long amount, String memo, LocalDateTime expenseAt, MemberCategory memberCategory) {
     this.id = id;
     this.amount = amount;
     this.memo = memo;
@@ -51,6 +52,19 @@ public class Expense {
     this.amount = amount;
     this.memo = memo;
     this.expenseAt = expenseAt;
+    this.memberCategory = memberCategory;
+  }
+
+  public void modify(PatchExpense dto, MemberCategory memberCategory) {
+    if (dto.amount() != null) {
+      this.amount = dto.amount();
+    }
+    if (dto.memo() != null) {
+      this.memo = dto.memo();
+    }
+    if (dto.expenseAt() != null) {
+      this.expenseAt = dto.expenseAt();
+    }
     this.memberCategory = memberCategory;
   }
 }
