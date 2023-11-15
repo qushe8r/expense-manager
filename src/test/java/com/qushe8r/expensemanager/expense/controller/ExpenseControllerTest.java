@@ -1,10 +1,13 @@
 package com.qushe8r.expensemanager.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
 import com.qushe8r.expensemanager.config.TestSecurityConfig;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
-import com.qushe8r.expensemanager.expense.service.ExpenseService;
+import com.qushe8r.expensemanager.expense.service.ExpenseCreateUseCase;
+import com.qushe8r.expensemanager.matcher.MemberDetailsMatcher;
 import com.qushe8r.expensemanager.matcher.PostExpenseMatcher;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,9 +35,10 @@ class ExpenseControllerTest {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private ExpenseService expenseService;
+  @MockBean private ExpenseCreateUseCase expenseCreateUseCase;
 
   @DisplayName("createExpense(): 입력값이 유효하면 성공한다.")
+  @WithMemberPrincipals
   @Test
   void createExpense() throws Exception {
     // given
@@ -48,8 +52,12 @@ class ExpenseControllerTest {
     PostExpense postExpense = new PostExpense(amount, memo, expenseDate, categoryId);
     String content = objectMapper.writeValueAsString(postExpense);
 
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
     BDDMockito.given(
-            expenseService.createExpense(Mockito.argThat(new PostExpenseMatcher(postExpense))))
+            expenseCreateUseCase.createExpense(
+                Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
+                Mockito.argThat(new PostExpenseMatcher(postExpense))))
         .willReturn(createdExpenseId);
 
     // when
@@ -67,8 +75,8 @@ class ExpenseControllerTest {
         .andExpect(
             MockMvcResultMatchers.header()
                 .string(HttpHeaders.LOCATION, EXPENSE_DEFAULT_URL + "/" + createdExpenseId));
-    Mockito.verify(expenseService, Mockito.times(1))
-        .createExpense(Mockito.argThat(new PostExpenseMatcher(postExpense)));
+    Mockito.verify(expenseCreateUseCase, Mockito.times(1))
+        .createExpense(Mockito.argThat(new MemberDetailsMatcher(memberDetails)),Mockito.argThat(new PostExpenseMatcher(postExpense)));
   }
 
   @DisplayName("createExpenseAmountNull(): amount가 null이면 400 BadRequest 응답한다.")
@@ -141,7 +149,8 @@ class ExpenseControllerTest {
     // given
     Long amount = 10000L;
     String memo = "돼지국밥";
-    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);;
+    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
+    ;
     Long categoryId = null;
 
     PostExpense postExpense = new PostExpense(amount, memo, expenseAt, categoryId);
