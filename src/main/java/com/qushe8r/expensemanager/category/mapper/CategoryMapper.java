@@ -1,5 +1,7 @@
-package com.qushe8r.expensemanager.category.dto;
+package com.qushe8r.expensemanager.category.mapper;
 
+import com.qushe8r.expensemanager.category.dto.CategoryResponse;
+import com.qushe8r.expensemanager.category.dto.PostCategory;
 import com.qushe8r.expensemanager.category.entity.Category;
 import java.util.List;
 import org.springframework.stereotype.Component;

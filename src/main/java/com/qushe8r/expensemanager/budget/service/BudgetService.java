@@ -25,7 +25,7 @@ public class BudgetService {
 
   @Transactional
   public Long createBudget(MemberCategory memberCategory, PostBudget dto) {
-    validateByMonthIfPresentThrow(dto);
+    validateByMonthIfPresentThrow(memberCategory, dto);
     Budget rowBudget = budgetMapper.toEntity(memberCategory, dto);
     Budget budget = budgetRepository.save(rowBudget);
     return budget.getId();
@@ -48,9 +48,9 @@ public class BudgetService {
         .ifPresent(budgetRepository::delete);
   }
 
-  private void validateByMonthIfPresentThrow(PostBudget dto) {
+  private void validateByMonthIfPresentThrow(MemberCategory memberCategory, PostBudget dto) {
     budgetRepository
-        .findByMonth(dto.month())
+        .findByMemberIdAndMonth(memberCategory.getId(), dto.month())
         .ifPresent(
             budget -> {
               throw new BudgetAlreadyExistsException();

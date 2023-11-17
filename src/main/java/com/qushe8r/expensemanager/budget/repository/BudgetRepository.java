@@ -8,7 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
-  Optional<Budget> findByMonth(YearMonth month);
+  @Query(
+      "SELECT b "
+          + "FROM Budget b "
+          + "WHERE b.memberCategory.id = :memberCategoryId "
+          + "AND b.month = :month")
+  Optional<Budget> findByMemberIdAndMonth(Long memberCategoryId, YearMonth month);
 
   @Query(
       "SELECT b "

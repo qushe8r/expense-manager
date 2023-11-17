@@ -1,9 +1,8 @@
-package com.qushe8r.expensemanager.budget.entity;
+package com.qushe8r.expensemanager.expense.entity;
 
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
-import com.qushe8r.expensemanager.common.converter.YearMonthAttributeConverter;
+import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.YearMonth;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,39 +20,51 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @Entity
-@Table(name = "budget")
+@Table(name = "expense")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Budget {
+public class Expense {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "budget_id")
+  @Column(name = "expense_id")
   private Long id;
 
   private Long amount;
 
-  @Column(columnDefinition = "date")
-  @Convert(converter = YearMonthAttributeConverter.class)
-  private YearMonth month;
+  private String memo;
+
+  private LocalDateTime expenseAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_category_id")
   private MemberCategory memberCategory;
 
-  public Budget(Long id, Long amount, YearMonth month, MemberCategory memberCategory) {
+  public Expense(
+      Long id, Long amount, String memo, LocalDateTime expenseAt, MemberCategory memberCategory) {
     this.id = id;
     this.amount = amount;
-    this.month = month;
+    this.memo = memo;
+    this.expenseAt = expenseAt;
     this.memberCategory = memberCategory;
   }
 
-  public Budget(Long amount, YearMonth month, MemberCategory memberCategory) {
+  public Expense(Long amount, String memo, LocalDateTime expenseAt, MemberCategory memberCategory) {
     this.amount = amount;
-    this.month = month;
+    this.memo = memo;
+    this.expenseAt = expenseAt;
     this.memberCategory = memberCategory;
   }
 
-  public void modify(Long amount) {
-    this.amount = amount;
+  public void modify(PatchExpense dto, MemberCategory memberCategory) {
+    if (dto.amount() != null) {
+      this.amount = dto.amount();
+    }
+    if (dto.memo() != null) {
+      this.memo = dto.memo();
+    }
+    if (dto.expenseAt() != null) {
+      this.expenseAt = dto.expenseAt();
+    }
+    this.memberCategory = memberCategory;
   }
 }

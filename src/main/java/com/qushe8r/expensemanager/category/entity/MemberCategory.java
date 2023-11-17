@@ -1,6 +1,7 @@
 package com.qushe8r.expensemanager.category.entity;
 
 import com.qushe8r.expensemanager.budget.entity.Budget;
+import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,6 +43,9 @@ public class MemberCategory {
   @OneToMany(mappedBy = "memberCategory")
   private List<Budget> budgets = new ArrayList<>();
 
+  @OneToMany(mappedBy = "memberCategory")
+  private List<Expense> expenses = new ArrayList<>();
+
   public MemberCategory(Long id, Member member, Category category) {
     this.id = id;
     this.member = member;
@@ -51,5 +55,12 @@ public class MemberCategory {
   public MemberCategory(Member member, Category category) {
     this.member = member;
     this.category = category;
+  }
+
+  public MemberCategory(Long id, Member member, Category category, List<Expense> expenses) {
+    this.id = id;
+    this.member = member;
+    this.category = category;
+    this.expenses = expenses;
   }
 }
