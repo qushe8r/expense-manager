@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,7 +34,7 @@ public class Member {
   private String password;
 
   @OneToMany(mappedBy = "member")
-  private List<MemberCategory> memberCategories;
+  private List<MemberCategory> memberCategories = new ArrayList<>();
 
   public Member(Long id, String email, String password) {
     this.id = id;
