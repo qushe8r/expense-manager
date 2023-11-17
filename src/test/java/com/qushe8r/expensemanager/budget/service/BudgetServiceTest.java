@@ -80,14 +80,15 @@ class BudgetServiceTest {
     Budget budget = new Budget(expectedId, amount, month, new MemberCategory(member, category));
 
     PostBudget postBudget = new PostBudget(amount, month, categoryId);
-    MemberCategory memberCategory = new MemberCategory(member, new Category(1L));
+    MemberCategory memberCategory = new MemberCategory(1L, member, new Category(1L));
 
-    BDDMockito.given(budgetRepository.findByMonth(month)).willReturn(Optional.of(budget));
+    BDDMockito.given(budgetRepository.findByMemberIdAndMonth(memberCategory.getId(), month))
+        .willReturn(Optional.of(budget));
 
     // when
     Assertions.assertThatThrownBy(() -> budgetService.createBudget(memberCategory, postBudget))
         .isInstanceOf(BudgetAlreadyExistsException.class);
-    Mockito.verify(budgetRepository, Mockito.times(1)).findByMonth(month);
+    Mockito.verify(budgetRepository, Mockito.times(1)).findByMemberIdAndMonth(memberCategory.getId(), month);
     Mockito.verify(budgetRepository, Mockito.times(0)).save(Mockito.any(Budget.class));
   }
 
