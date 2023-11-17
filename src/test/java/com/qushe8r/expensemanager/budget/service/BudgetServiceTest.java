@@ -88,7 +88,8 @@ class BudgetServiceTest {
     // when
     Assertions.assertThatThrownBy(() -> budgetService.createBudget(memberCategory, postBudget))
         .isInstanceOf(BudgetAlreadyExistsException.class);
-    Mockito.verify(budgetRepository, Mockito.times(1)).findByMemberIdAndMonth(memberCategory.getId(), month);
+    Mockito.verify(budgetRepository, Mockito.times(1))
+        .findByMemberIdAndMonth(memberCategory.getId(), month);
     Mockito.verify(budgetRepository, Mockito.times(0)).save(Mockito.any(Budget.class));
   }
 
