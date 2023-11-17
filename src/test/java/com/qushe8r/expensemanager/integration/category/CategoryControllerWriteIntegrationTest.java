@@ -2,6 +2,8 @@ package com.qushe8r.expensemanager.integration.category;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.category.dto.PostCategory;
+import com.qushe8r.expensemanager.category.entity.Category;
+import com.qushe8r.expensemanager.category.repository.CategoryRepository;
 import com.qushe8r.expensemanager.config.DataSourceSelector;
 import com.qushe8r.expensemanager.security.jwt.JwtProperties;
 import com.qushe8r.expensemanager.security.jwt.TokenProvider;
@@ -39,6 +41,8 @@ class CategoryControllerWriteIntegrationTest {
 
   @Autowired private DataSourceSelector dataSourceSelector;
 
+  @Autowired private CategoryRepository categoryRepository;
+
   @BeforeEach
   void setUp() {
     dataSourceSelector.toWrite();
@@ -67,6 +71,40 @@ class CategoryControllerWriteIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("JX03"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(401))
         .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("토큰이 없습니다."))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("createCategoryCategoryAlreadyExistException(): 이미 존재하는 카테고리명을 입력하면 에러가 발생한다.")
+  @Test
+  void createCategoryCategoryAlreadyExistException() throws Exception {
+    // given
+    dataSourceSelector.toWrite();
+
+    Category category = new Category(CATEGORY_NAME);
+    categoryRepository.save(category);
+
+    PostCategory postCategory = new PostCategory(CATEGORY_NAME);
+    String content = objectMapper.writeValueAsString(postCategory);
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(CATEGORY_DEFAULT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .characterEncoding(StandardCharsets.UTF_8.name())
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isConflict())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("MX02"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(409))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("이미 존재하는 카테고리입니다."))
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
