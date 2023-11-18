@@ -53,6 +53,7 @@ class ExpenseUpdateUseCaseTest {
 
     BDDMockito.given(
             expenseService.modifyExpense(
+                Mockito.eq(memberId),
                 Mockito.argThat(new MemberCategoryMatcher(membercategory)),
                 Mockito.eq(expenseId),
                 Mockito.argThat(new PatchExpenseMatcher(patchExpense))))
@@ -73,6 +74,7 @@ class ExpenseUpdateUseCaseTest {
         .findByMemberCategoryOrElseSave(memberId, categoryId);
     Mockito.verify(expenseService, Mockito.times(1))
         .modifyExpense(
+            Mockito.eq(memberId),
             Mockito.argThat(new MemberCategoryMatcher(membercategory)),
             Mockito.eq(expenseId),
             Mockito.argThat(new PatchExpenseMatcher(patchExpense)));

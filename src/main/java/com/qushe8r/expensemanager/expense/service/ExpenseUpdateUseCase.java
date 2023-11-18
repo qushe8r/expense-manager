@@ -27,6 +27,6 @@ public class ExpenseUpdateUseCase {
     MemberCategory memberCategory =
         memberCategoryService.findByMemberCategoryOrElseSave(
             memberDetails.getId(), dto.categoryId());
-    return expenseService.modifyExpense(memberCategory, expenseId, dto);
+    return expenseService.modifyExpense(memberDetails.getId(), memberCategory, expenseId, dto);
   }
 }
