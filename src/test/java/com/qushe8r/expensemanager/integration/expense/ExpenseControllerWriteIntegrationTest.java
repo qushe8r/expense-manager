@@ -220,4 +220,48 @@ class ExpenseControllerWriteIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
+
+  @DisplayName("deleteExpense(): 입력값이 유효하면 204 NoContent 응답한다.")
+  @Test
+  void deleteExpense() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    Long expenseId = 1L;
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @DisplayName("deleteExpense(): 입력값이 유효하면 204 NoContent 응답한다.")
+  @Test
+  void deleteExpenseInvalidUser() throws Exception {
+    // given
+    String anotherUserAccessToken = JwtFactory.withAnotherUserValues().generateToken(jwtProperties);
+
+    Long expenseId = 1L;
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + anotherUserAccessToken));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
 }
