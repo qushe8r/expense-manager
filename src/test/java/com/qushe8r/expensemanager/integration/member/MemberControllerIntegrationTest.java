@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.config.DataSourceSelector;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class MemberControllerIntegrationTest {
 
+  private static final String EMAIL_EXISTS = "test@email.com";
+
   private static final String EMAIL_EXAMPLE = "test2@email.com";
 
   private static final String PASSWORD_EXAMPLE = "c2f9x9@43a";
@@ -39,6 +42,7 @@ class MemberControllerIntegrationTest {
     dataSourceSelector.toWrite();
   }
 
+  @DisplayName("createMember(): 입력값이 유효하면 회원가입에 성공한다")
   @Test
   void createMember() throws Exception {
     // given
@@ -58,5 +62,31 @@ class MemberControllerIntegrationTest {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.LOCATION));
+  }
+
+  @DisplayName("createMemberMemberAlreadyExistsException(): 이미 회원으로 존재하는 아이디를 입력하면 예외가 발생한다")
+  @Test
+  void createMemberMemberAlreadyExistsException() throws Exception {
+    // given
+    PostMember postMember = new PostMember(EMAIL_EXISTS, PASSWORD_EXAMPLE);
+    String content = objectMapper.writeValueAsString(postMember);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.post(MEMBER_DEFAULT_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isConflict())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("MX02"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(409))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("이미 존재하는 회원입니다."))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 }
