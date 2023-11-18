@@ -107,4 +107,118 @@ class CategoryControllerReadIntegrationTest {
             MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].expenseAt")
                 .isString());
   }
+
+  @DisplayName("getCategorizedExpenseValidateEndBeforeStartException(): "
+      + "start가 end보다 뒤라면 예외가 발생한다")
+  @Test
+  void getCategorizedExpenseValidateEndBeforeStartException() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    LocalDate start = LocalDate.of(2023, 11, 30);
+    LocalDate end = LocalDate.of(2023, 11, 1);
+    Long min = 10000L;
+    Long max = 50000L;
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("start", start.toString());
+    params.add("end", end.toString());
+    params.add("min", String.valueOf(min));
+    params.add("max", String.valueOf(max));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .params(params));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("PX01"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("종료일이 시작일보다 빠릅니다."))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("getCategorizedExpenseValidateDurationException(): "
+      + "start와 end가 31일 이상 차이난다면 예외가 발생한다")
+  @Test
+  void getCategorizedExpenseValidateDurationException() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    LocalDate start = LocalDate.of(2023, 11, 1);
+    LocalDate end = LocalDate.of(2023, 12, 5);
+    Long min = 10000L;
+    Long max = 50000L;
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("start", start.toString());
+    params.add("end", end.toString());
+    params.add("min", String.valueOf(min));
+    params.add("max", String.valueOf(max));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .params(params));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("PX02"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("최대 조회 일수는 한달입니다."))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("getCategorizedExpenseValidateRangeException(): "
+      + "min이 max 보다 크다면 예외가 발생한다")
+  @Test
+  void getCategorizedExpenseValidateRangeException() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    LocalDate start = LocalDate.of(2023, 11, 1);
+    LocalDate end = LocalDate.of(2023, 11, 30);
+    Long min = 50000L;
+    Long max = 10000L;
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("start", start.toString());
+    params.add("end", end.toString());
+    params.add("min", String.valueOf(min));
+    params.add("max", String.valueOf(max));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .params(params));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("PX03"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("금액의 범위가 잘못 지정 되었습니다."))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
 }
