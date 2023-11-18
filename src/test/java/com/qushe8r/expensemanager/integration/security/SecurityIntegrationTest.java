@@ -2,7 +2,6 @@ package com.qushe8r.expensemanager.integration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.config.DataSourceSelector;
-import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.security.dto.UsernamePassword;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

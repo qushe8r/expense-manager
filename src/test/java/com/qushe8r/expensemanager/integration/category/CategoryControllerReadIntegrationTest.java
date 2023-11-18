@@ -108,8 +108,8 @@ class CategoryControllerReadIntegrationTest {
                 .isString());
   }
 
-  @DisplayName("getCategorizedExpenseValidateEndBeforeStartException(): "
-      + "start가 end보다 뒤라면 예외가 발생한다")
+  @DisplayName(
+      "getCategorizedExpenseValidateEndBeforeStartException(): " + "start가 end보다 뒤라면 예외가 발생한다")
   @Test
   void getCategorizedExpenseValidateEndBeforeStartException() throws Exception {
     // given
@@ -146,8 +146,8 @@ class CategoryControllerReadIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 
-  @DisplayName("getCategorizedExpenseValidateDurationException(): "
-      + "start와 end가 31일 이상 차이난다면 예외가 발생한다")
+  @DisplayName(
+      "getCategorizedExpenseValidateDurationException(): " + "start와 end가 31일 이상 차이난다면 예외가 발생한다")
   @Test
   void getCategorizedExpenseValidateDurationException() throws Exception {
     // given
@@ -184,8 +184,7 @@ class CategoryControllerReadIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 
-  @DisplayName("getCategorizedExpenseValidateRangeException(): "
-      + "min이 max 보다 크다면 예외가 발생한다")
+  @DisplayName("getCategorizedExpenseValidateRangeException(): " + "min이 max 보다 크다면 예외가 발생한다")
   @Test
   void getCategorizedExpenseValidateRangeException() throws Exception {
     // given

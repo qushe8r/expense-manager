@@ -1,9 +1,5 @@
 package com.qushe8r.expensemanager.member.entity;
 
-import com.qushe8r.expensemanager.budget.entity.Budget;
-import com.qushe8r.expensemanager.category.entity.Category;
-import com.qushe8r.expensemanager.category.entity.MemberCategory;
-import java.time.YearMonth;
 import java.util.Collections;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
