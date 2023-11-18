@@ -37,6 +37,10 @@ public class JwtFactory {
     return new JwtFactory(null, null, null, null);
   }
 
+  public static JwtFactory withAnotherUserValues() {
+    return new JwtFactory("anotherUser@email.com", null, null, Map.of("id", 2L));
+  }
+
   public static JwtFactory withExpired() {
     return new JwtFactory(null, generateTime(-10), generateTime(0), null);
   }
