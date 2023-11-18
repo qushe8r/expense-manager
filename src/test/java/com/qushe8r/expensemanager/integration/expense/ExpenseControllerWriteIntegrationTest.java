@@ -149,6 +149,42 @@ class ExpenseControllerWriteIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.categoryName").value("카테고리"));
   }
 
+  @DisplayName("modifyExpense(): 다른 유저가 접근하면 예외가 발생한다")
+  @Test
+  void modifyExpenseAnotherUser() throws Exception {
+    // given
+    String anotherUserAccessToken = JwtFactory.withAnotherUserValues().generateToken(jwtProperties);
+
+    Long expenseId = 1L;
+
+    Long amount = 10000L;
+    String memo = "돼지국밥";
+    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
+    Long categoryId = 1L;
+
+    PatchExpense patchExpense = new PatchExpense(amount, memo, expenseAt, categoryId);
+    String content = objectMapper.writeValueAsString(patchExpense);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.patch(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + anotherUserAccessToken)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNotFound())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("EX01"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("예산을 찾을 수 없습니다."))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
   @DisplayName("modifyExpense(): 입력값이 유효하면 성공한다.")
   @Test
   void modifyExpenseCategoryNotFoundException() throws Exception {
