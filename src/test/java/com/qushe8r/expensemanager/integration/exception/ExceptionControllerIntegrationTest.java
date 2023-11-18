@@ -179,4 +179,29 @@ class ExceptionControllerIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
+
+  @DisplayName("exception(): 체크되지 않은 예외가 발생하면 500 응답을 한다")
+  @Test
+  void exception() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/exceptions")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(500))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Internal Server Error"))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
 }
