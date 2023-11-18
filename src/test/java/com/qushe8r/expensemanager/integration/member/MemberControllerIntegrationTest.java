@@ -1,7 +1,9 @@
 package com.qushe8r.expensemanager.integration.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qushe8r.expensemanager.config.DataSourceSelector;
 import com.qushe8r.expensemanager.member.dto.PostMember;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class MemberControllerIntegrationTest {
 
-  private static final String EMAIL_EXAMPLE = "test@email.com";
+  private static final String EMAIL_EXAMPLE = "test2@email.com";
 
   private static final String PASSWORD_EXAMPLE = "c2f9x9@43a";
 
@@ -29,6 +31,13 @@ class MemberControllerIntegrationTest {
   @Autowired private MockMvc mockMvc;
 
   @Autowired private ObjectMapper objectMapper;
+
+  @Autowired private DataSourceSelector dataSourceSelector;
+
+  @BeforeEach
+  void setUp() {
+    dataSourceSelector.toWrite();
+  }
 
   @Test
   void createMember() throws Exception {

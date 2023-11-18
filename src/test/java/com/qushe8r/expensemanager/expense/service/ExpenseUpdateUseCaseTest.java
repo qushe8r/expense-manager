@@ -2,6 +2,7 @@ package com.qushe8r.expensemanager.expense.service;
 
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.category.service.CategoryService;
 import com.qushe8r.expensemanager.category.service.MemberCategoryService;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
@@ -27,6 +28,8 @@ class ExpenseUpdateUseCaseTest {
 
   @Mock private ExpenseService expenseService;
 
+  @Mock private CategoryService categoryService;
+
   @InjectMocks private ExpenseUpdateUseCase expenseUpdateUseCase;
 
   @DisplayName("modifyBudget(): 정상 입")
@@ -47,6 +50,9 @@ class ExpenseUpdateUseCaseTest {
     Category category = new Category(patchExpense.categoryId(), categoryName);
     Member member = new Member(1L, "test@email.com", "");
     MemberCategory membercategory = new MemberCategory(memberId, member, category);
+
+    BDDMockito.given(categoryService.validateCategoryByIdOrElseThrow(categoryId))
+        .willReturn(category);
 
     BDDMockito.given(memberCategoryService.findByMemberCategoryOrElseSave(memberId, categoryId))
         .willReturn(membercategory);
