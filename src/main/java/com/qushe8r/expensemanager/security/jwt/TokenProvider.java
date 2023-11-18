@@ -47,11 +47,6 @@ public class TokenProvider {
     return generateAccessToken(jti, subject, issuedAt, expiration, claims, secretKey(secret));
   }
 
-  public String generateAccessToken(
-      String jti, String subject, Date issuedAt, Date expiration, Map<String, Object> claims) {
-    return generateAccessToken(jti, subject, issuedAt, expiration, claims, secretKey());
-  }
-
   public String generateBearerAccessToken(String jti, String subject, Map<String, Object> claims) {
     return BEARER
         + generateAccessToken(
