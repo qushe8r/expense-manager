@@ -92,7 +92,8 @@ class ExpenseServiceTest {
                     memberCategory)));
 
     // when
-    ExpenseResponse result = expenseService.modifyExpense(memberId, memberCategory, expenseId, patchExpense);
+    ExpenseResponse result =
+        expenseService.modifyExpense(memberId, memberCategory, expenseId, patchExpense);
 
     // then
     Assertions.assertThat(result)
