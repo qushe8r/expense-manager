@@ -12,10 +12,8 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "category")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,7 +28,7 @@ public class Category {
   private String name;
 
   @OneToMany(mappedBy = "category")
-  private List<MemberCategory> memberCategory = new ArrayList<>();
+  private List<MemberCategory> memberCategories = new ArrayList<>();
 
   public Category(Long id, String name) {
     this.id = id;
