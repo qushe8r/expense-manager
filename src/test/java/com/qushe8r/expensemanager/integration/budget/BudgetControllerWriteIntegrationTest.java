@@ -198,4 +198,48 @@ class BudgetControllerWriteIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
+
+  @DisplayName("deleteBudget(): 정상적으로 삭제되면 noContent 상태코드만 응답한다.")
+  @Test
+  void deleteBudget() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    Long budgetId = 1L;
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
+
+  @DisplayName("deleteBudget(): 존재하지 않는 id를 입력해도 noContent 상태코드만 응답한다.")
+  @Test
+  void deleteBudgetNotExistId() throws Exception {
+    // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    Long budgetId = Long.MAX_VALUE;
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isNoContent());
+  }
 }
