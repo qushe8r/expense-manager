@@ -37,6 +37,8 @@ public class SecurityConfig {
                     .requestMatchers("/budgets/**")
                     .authenticated()
                     .requestMatchers("/expenses/**")
+                    .authenticated()
+                    .anyRequest()
                     .authenticated())
         .headers(header -> header.frameOptions(FrameOptionsConfig::sameOrigin))
         .formLogin(AbstractHttpConfigurer::disable)
