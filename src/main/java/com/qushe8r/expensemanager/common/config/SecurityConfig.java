@@ -27,7 +27,17 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.apply(jwtFilterConfig);
 
-    return http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+    return http.authorizeHttpRequests(
+            authorize ->
+                authorize
+                    .requestMatchers("/members/**")
+                    .permitAll()
+                    .requestMatchers("/categories/**")
+                    .authenticated()
+                    .requestMatchers("/budgets/**")
+                    .authenticated()
+                    .requestMatchers("/expenses/**")
+                    .authenticated())
         .headers(header -> header.frameOptions(FrameOptionsConfig::sameOrigin))
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
