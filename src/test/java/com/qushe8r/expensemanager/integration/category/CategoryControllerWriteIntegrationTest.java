@@ -2,8 +2,6 @@ package com.qushe8r.expensemanager.integration.category;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.category.dto.PostCategory;
-import com.qushe8r.expensemanager.category.entity.Category;
-import com.qushe8r.expensemanager.category.repository.CategoryRepository;
 import com.qushe8r.expensemanager.config.DataSourceSelector;
 import com.qushe8r.expensemanager.security.jwt.JwtProperties;
 import com.qushe8r.expensemanager.security.jwt.TokenProvider;
@@ -29,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class CategoryControllerWriteIntegrationTest {
 
-  private static final String CATEGORY_NAME = "카테고리";
+  private static final String CATEGORY_NAME = "카테고리이름";
 
   private static final String CATEGORY_DEFAULT_URL = "/categories";
 
@@ -40,8 +38,6 @@ class CategoryControllerWriteIntegrationTest {
   @Autowired private JwtProperties jwtProperties;
 
   @Autowired private DataSourceSelector dataSourceSelector;
-
-  @Autowired private CategoryRepository categoryRepository;
 
   @BeforeEach
   void setUp() {
@@ -79,14 +75,10 @@ class CategoryControllerWriteIntegrationTest {
   @Test
   void createCategoryCategoryAlreadyExistException() throws Exception {
     // given
-    dataSourceSelector.toWrite();
-
-    Category category = new Category(CATEGORY_NAME);
-    categoryRepository.save(category);
-
-    PostCategory postCategory = new PostCategory(CATEGORY_NAME);
-    String content = objectMapper.writeValueAsString(postCategory);
     String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    PostCategory postCategory = new PostCategory("카테고리");
+    String content = objectMapper.writeValueAsString(postCategory);
 
     // when
     ResultActions actions =
@@ -113,9 +105,10 @@ class CategoryControllerWriteIntegrationTest {
   @Test
   void createCategory() throws Exception {
     // given
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
     PostCategory postCategory = new PostCategory(CATEGORY_NAME);
     String content = objectMapper.writeValueAsString(postCategory);
-    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
 
     // when
     ResultActions actions =
@@ -124,8 +117,8 @@ class CategoryControllerWriteIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .characterEncoding(StandardCharsets.UTF_8.name())
-                .content(content)
-                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken));
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .content(content));
 
     // then
     actions

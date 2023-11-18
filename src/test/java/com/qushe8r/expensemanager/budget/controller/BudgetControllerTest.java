@@ -106,7 +106,7 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 
-  @DisplayName("createBudget(): 예산이 null 이라면 실패한다")
+  @DisplayName("createBudgetMonthNull(): month가 null 이라면 실패한다")
   @WithMemberPrincipals
   @Test
   void createBudgetMonthNull() throws Exception {
@@ -134,7 +134,7 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
   }
 
-  @DisplayName("createBudget(): 카테고리 식별자가 null 이라면 실패한다")
+  @DisplayName("createBudgetCategoryIdNull(): 카테고리 식별자가 null 이라면 실패한다")
   @WithMemberPrincipals
   @Test
   void createBudgetCategoryIdNull() throws Exception {

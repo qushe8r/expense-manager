@@ -84,8 +84,8 @@ class CategoryControllerReadIntegrationTest {
             MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .params(params)
-                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken));
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .params(params));
 
     // then
     actions
