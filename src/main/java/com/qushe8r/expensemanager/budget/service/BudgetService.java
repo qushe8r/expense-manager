@@ -1,5 +1,7 @@
 package com.qushe8r.expensemanager.budget.service;
 
+import com.qushe8r.expensemanager.budget.dto.BudgetRecommendationRate;
+import com.qushe8r.expensemanager.budget.dto.BudgetRecommendationResponse;
 import com.qushe8r.expensemanager.budget.dto.BudgetResponse;
 import com.qushe8r.expensemanager.budget.dto.PatchBudget;
 import com.qushe8r.expensemanager.budget.dto.PostBudget;
@@ -7,9 +9,11 @@ import com.qushe8r.expensemanager.budget.entity.Budget;
 import com.qushe8r.expensemanager.budget.exception.BudgetAlreadyExistsException;
 import com.qushe8r.expensemanager.budget.exception.BudgetNotFoundException;
 import com.qushe8r.expensemanager.budget.mapper.BudgetMapper;
+import com.qushe8r.expensemanager.budget.repository.BudgetRecommendationRepository;
 import com.qushe8r.expensemanager.budget.repository.BudgetRepository;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +26,8 @@ public class BudgetService {
   private final BudgetMapper budgetMapper;
 
   private final BudgetRepository budgetRepository;
+
+  private final BudgetRecommendationRepository budgetRecommendationRepository;
 
   @Transactional
   public Long createBudget(MemberCategory memberCategory, PostBudget dto) {
@@ -55,5 +61,15 @@ public class BudgetService {
             budget -> {
               throw new BudgetAlreadyExistsException();
             });
+  }
+
+  public List<BudgetRecommendationResponse> getRecommendation(Long amount) {
+    List<BudgetRecommendationRate> rates = budgetRecommendationRepository.getRecommendation();
+    return rates.stream()
+        .map(
+            rate ->
+                new BudgetRecommendationResponse(
+                    rate.categoryName(), (long) (rate.rate() * amount)))
+        .toList();
   }
 }

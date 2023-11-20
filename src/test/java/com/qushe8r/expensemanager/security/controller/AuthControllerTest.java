@@ -51,7 +51,8 @@ class AuthControllerTest {
                 .cookie(cookie));
 
     // then
-    actions.andDo(MockMvcResultHandlers.print())
+    actions
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.AUTHORIZATION, newAccessToken))
         .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.SET_COOKIE));
