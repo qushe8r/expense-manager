@@ -1,5 +1,7 @@
 package com.qushe8r.expensemanager.budget.service;
 
+import com.qushe8r.expensemanager.budget.dto.BudgetRecommendationRate;
+import com.qushe8r.expensemanager.budget.dto.BudgetRecommendationResponse;
 import com.qushe8r.expensemanager.budget.dto.BudgetResponse;
 import com.qushe8r.expensemanager.budget.dto.PatchBudget;
 import com.qushe8r.expensemanager.budget.dto.PostBudget;
@@ -7,6 +9,7 @@ import com.qushe8r.expensemanager.budget.entity.Budget;
 import com.qushe8r.expensemanager.budget.exception.BudgetAlreadyExistsException;
 import com.qushe8r.expensemanager.budget.exception.BudgetNotFoundException;
 import com.qushe8r.expensemanager.budget.mapper.BudgetMapper;
+import com.qushe8r.expensemanager.budget.repository.BudgetRecommendationRepository;
 import com.qushe8r.expensemanager.budget.repository.BudgetRepository;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
@@ -14,6 +17,7 @@ import com.qushe8r.expensemanager.matcher.BudgetMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +36,8 @@ class BudgetServiceTest {
   @Spy private BudgetMapper budgetMapper;
 
   @Mock private BudgetRepository budgetRepository;
+
+  @Mock private BudgetRecommendationRepository budgetRecommendationRepository;
 
   @InjectMocks private BudgetService budgetService;
 
@@ -182,5 +188,32 @@ class BudgetServiceTest {
         .findBudgetByIdAndMemberId(memberDetails.getId(), budgetId);
     Mockito.verify(budgetRepository, Mockito.times(1))
         .delete(Mockito.argThat(new BudgetMatcher(budget)));
+  }
+
+  @Test
+  void getRecommendation() {
+    // given
+    Long amount = 1000000L;
+    List<BudgetRecommendationRate> rates =
+        List.of(
+            new BudgetRecommendationRate("카테고리1", 0.3),
+            new BudgetRecommendationRate("카테고리2", 0.4),
+            new BudgetRecommendationRate("카테고리3", 0.3));
+
+    BDDMockito.given(budgetRecommendationRepository.getRecommendation()).willReturn(rates);
+
+    // when
+    List<BudgetRecommendationResponse> result = budgetService.getRecommendation(amount);
+
+    // then
+    Assertions.assertThat(result.get(0))
+        .hasFieldOrPropertyWithValue("categoryName", "카테고리1")
+        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.3));
+    Assertions.assertThat(result.get(1))
+        .hasFieldOrPropertyWithValue("categoryName", "카테고리2")
+        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.4));
+    Assertions.assertThat(result.get(2))
+        .hasFieldOrPropertyWithValue("categoryName", "카테고리3")
+        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.3));
   }
 }
