@@ -13,7 +13,9 @@ import com.qushe8r.expensemanager.budget.repository.BudgetRecommendationReposito
 import com.qushe8r.expensemanager.budget.repository.BudgetRepository;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,12 +66,30 @@ public class BudgetService {
   }
 
   public List<BudgetRecommendationResponse> getRecommendation(Long amount) {
-    List<BudgetRecommendationRate> rates = budgetRecommendationRepository.getRecommendation();
-    return rates.stream()
-        .map(
-            rate ->
-                new BudgetRecommendationResponse(
-                    rate.categoryName(), (long) (rate.rate() * amount)))
-        .toList();
+    List<BudgetRecommendationRate> categorizedRecommendationRates =
+        budgetRecommendationRepository.getRecommendation();
+
+    long etcTotal =
+        categorizedRecommendationRates.stream()
+            .filter(recommendation -> !isOverTenPercentOrNotEtcCategory(recommendation))
+            .mapToLong(rate -> (long) (rate.rate() * amount))
+            .sum();
+
+    List<BudgetRecommendationResponse> responses =
+        categorizedRecommendationRates.stream()
+            .filter(this::isOverTenPercentOrNotEtcCategory)
+            .map(
+                recommendation ->
+                    new BudgetRecommendationResponse(
+                        recommendation.categoryName(), (long) (recommendation.rate() * amount)))
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    responses.add(new BudgetRecommendationResponse("기타", etcTotal));
+
+    return responses;
+  }
+
+  private boolean isOverTenPercentOrNotEtcCategory(BudgetRecommendationRate recommendation) {
+    return recommendation.rate() >= 0.1 && !recommendation.categoryName().equals("기타");
   }
 }

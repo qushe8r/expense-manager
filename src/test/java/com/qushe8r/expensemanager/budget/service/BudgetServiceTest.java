@@ -197,8 +197,14 @@ class BudgetServiceTest {
     List<BudgetRecommendationRate> rates =
         List.of(
             new BudgetRecommendationRate("카테고리1", 0.3),
-            new BudgetRecommendationRate("카테고리2", 0.4),
-            new BudgetRecommendationRate("카테고리3", 0.3));
+            new BudgetRecommendationRate("카테고리2", 0.25),
+            new BudgetRecommendationRate("카테고리3", 0.08),
+            new BudgetRecommendationRate("카테고리4", 0.20),
+            new BudgetRecommendationRate("카테고리5", 0.02),
+            new BudgetRecommendationRate("카테고리6", 0.07),
+            new BudgetRecommendationRate("기타", 0.08)
+        );
+
 
     BDDMockito.given(budgetRecommendationRepository.getRecommendation()).willReturn(rates);
 
@@ -206,14 +212,18 @@ class BudgetServiceTest {
     List<BudgetRecommendationResponse> result = budgetService.getRecommendation(amount);
 
     // then
+    Assertions.assertThat(result).size().isEqualTo(4);
     Assertions.assertThat(result.get(0))
         .hasFieldOrPropertyWithValue("categoryName", "카테고리1")
         .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.3));
     Assertions.assertThat(result.get(1))
         .hasFieldOrPropertyWithValue("categoryName", "카테고리2")
-        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.4));
+        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.25));
     Assertions.assertThat(result.get(2))
-        .hasFieldOrPropertyWithValue("categoryName", "카테고리3")
-        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.3));
+        .hasFieldOrPropertyWithValue("categoryName", "카테고리4")
+        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.2));
+    Assertions.assertThat(result.get(3))
+        .hasFieldOrPropertyWithValue("categoryName", "기타")
+        .hasFieldOrPropertyWithValue("amount", (long) (amount * 0.25));
   }
 }
