@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,14 @@ public class ExpenseController {
       @PathVariable @Positive Long expenseId,
       @RequestBody PatchExpense dto) {
     ExpenseResponse response = expenseUpdateUseCase.modifyExpense(memberDetails, expenseId, dto);
+    return ResponseEntity.ok(new SingleResponse<>(response));
+  }
+
+  @GetMapping("/{expenseId}")
+  public ResponseEntity<SingleResponse<ExpenseResponse>> getExpense(
+      @AuthenticationPrincipal MemberDetails memberDetails,
+      @PathVariable @Positive Long expenseId) {
+    ExpenseResponse response = expenseService.getExpense(memberDetails.getId(), expenseId);
     return ResponseEntity.ok(new SingleResponse<>(response));
   }
 
