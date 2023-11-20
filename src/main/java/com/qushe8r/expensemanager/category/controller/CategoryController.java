@@ -53,12 +53,13 @@ public class CategoryController {
   @GetMapping("/expenses")
   public ResponseEntity<SingleResponse<GlobalTotalsExpenseResponse>> getCategorizedExpense(
       @AuthenticationPrincipal MemberDetails memberDetails,
-      @RequestParam(value = "start") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDate start,
-      @RequestParam(value = "end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDate end,
+      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDate start,
+      @RequestParam @DateTimeFormat(iso = ISO.DATE_TIME) LocalDate end,
+      @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) @Positive Long min,
       @RequestParam(required = false) @Positive Long max) {
     GlobalTotalsExpenseResponse response =
-        memberCategoryService.getCategorizedExpense(memberDetails, start, end, min, max);
+        memberCategoryService.getCategorizedExpense(memberDetails, start, end, categoryId, min, max);
     return ResponseEntity.ok(new SingleResponse<>(response));
   }
 }
