@@ -4,6 +4,7 @@ import com.qushe8r.expensemanager.matcher.MemberMatcher;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.member.exception.MemberAlreadyExistException;
+import com.qushe8r.expensemanager.member.exception.MemberNotFoundException;
 import com.qushe8r.expensemanager.member.mapper.MemberMapper;
 import com.qushe8r.expensemanager.member.repository.MemberRepository;
 import java.util.Optional;
@@ -79,5 +80,41 @@ class MemberServiceTest {
     Assertions.assertThatThrownBy(() -> memberService.createMember(postMember))
         .isInstanceOf(MemberAlreadyExistException.class);
     Mockito.verify(memberRepository, Mockito.times(1)).findByEmail(email);
+  }
+
+  @DisplayName("validateMemberExistByEmailOrElseThrow(): 멤버가 존재하면 응답해준다")
+  @Test
+  void validateMemberExistByEmailOrElseThrow() {
+    // given
+    Long memberId = 1L;
+    String email = "test@email.com";
+    String password = "password";
+
+    Member member = new Member(memberId, email, password);
+
+    BDDMockito.given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
+
+    // when
+    Member result = memberService.validateMemberExistByEmailOrElseThrow(email);
+
+    // then
+    Assertions.assertThat(result)
+        .hasFieldOrPropertyWithValue("id", memberId)
+        .hasFieldOrPropertyWithValue("email", email)
+        .hasFieldOrPropertyWithValue("password", password);
+  }
+
+  @DisplayName(
+      "validateMemberExistByEmailOrElseThrowMemberNotFoundException(): 멤버가 존재하지 않으면 예외를 던진다")
+  @Test
+  void validateMemberExistByEmailOrElseThrowMemberNotFoundException() {
+    // given
+    String email = "test@email.com";
+
+    BDDMockito.given(memberRepository.findByEmail(email)).willReturn(Optional.empty());
+
+    // when & then
+    Assertions.assertThatThrownBy(() -> memberService.validateMemberExistByEmailOrElseThrow(email))
+        .isInstanceOf(MemberNotFoundException.class);
   }
 }
