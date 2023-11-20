@@ -1,5 +1,6 @@
 package com.qushe8r.expensemanager.security.jwt;
 
+import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.stub.JwtFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -7,11 +8,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
-import java.util.Date;
 import java.util.Map;
-import java.util.Random;
 import javax.crypto.SecretKey;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -35,67 +33,77 @@ class TokenProviderTest {
   @Autowired
   private JwtProperties jwtProperties;
 
-  @DisplayName("generateAccessToken(): JWT 정상 발급 테스트")
   @Test
-  void generateAccessToken() {
+  void generateAccessTokenByMember() {
     // given
-    String subject = "subject";
+    String jti = "jti";
+    Member member = new Member(1L, "test@email.com", "password");
 
-    String secret = "WITHOUT_WEAK_KEY_EXCEPTION";
     byte[] base64EncodedSecret =
-        Base64.getEncoder().encode(secret.getBytes(StandardCharsets.UTF_8));
+        Base64.getEncoder().encode(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     SecretKey secretKey = Keys.hmacShaKeyFor(base64EncodedSecret);
 
-    String stringName = "stringName";
-    String stringValue = "string";
-    String longName = "longName";
-    Long longValue = new Random().nextLong();
-    Map<String, Object> claims = Map.of(stringName, stringValue, longName, longValue);
-
-    String jti = "jti";
-
-    String accessToken =
-        tokenProvider.generateAccessToken(
-            jti,
-            subject,
-            new Date(),
-            new Date(new Date().getTime() + Duration.ofMinutes(5).toMillis()),
-            claims,
-            secret);
+    String bearerAccessToken = tokenProvider.generateBearerAccessToken(jti, member);
+    String accessToken = bearerAccessToken.substring("Bearer ".length());
 
     // when
-    Claims payload =
+    Claims result =
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessToken).getPayload();
 
     // then
-    Assertions.assertThat(payload.getSubject()).isEqualTo("subject");
-    Assertions.assertThat(payload.get(stringName, String.class)).isEqualTo(stringValue);
-    Assertions.assertThat(payload.get(longName, Long.class)).isEqualTo(longValue);
+    Assertions.assertThat(result)
+        .hasFieldOrPropertyWithValue("id", jti)
+        .hasFieldOrPropertyWithValue("subject", member.getEmail());
+    Assertions.assertThat(result.get("id", Long.class)).isEqualTo(member.getId());
+  }
+
+  @Test
+  void generateAccessTokenBy() {
+    // given
+    String jti = "jti";
+    Long memberId = 1L;
+    String email = "test@email.com";
+
+    Map<String, Object> claims = Map.of("id", memberId);
+
+    byte[] base64EncodedSecret =
+        Base64.getEncoder().encode(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+    SecretKey secretKey = Keys.hmacShaKeyFor(base64EncodedSecret);
+
+    String bearerAccessToken = tokenProvider.generateBearerAccessToken(jti, email, claims);
+    String accessToken = bearerAccessToken.substring("Bearer ".length());
+
+    // when
+    Claims result =
+        Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessToken).getPayload();
+
+    // then
+    Assertions.assertThat(result)
+        .hasFieldOrPropertyWithValue("id", jti)
+        .hasFieldOrPropertyWithValue("subject", email);
+    Assertions.assertThat(result.get("id", Long.class)).isEqualTo(memberId);
   }
 
   @Test
   void generateRefreshToken() {
     // given
     String jti = "jti";
+    String email = "test@email.com";
 
-    String subject = "subject";
+    String refreshToken = tokenProvider.generateRefreshToken(jti, email);
 
-    String secret = "JWT_SECRET_KEY_FOR_TEST_WITHOUT_WEAK_KEY_EXCEPTION";
     byte[] base64EncodedSecret =
-        Base64.getEncoder().encode(secret.getBytes(StandardCharsets.UTF_8));
+        Base64.getEncoder().encode(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     SecretKey secretKey = Keys.hmacShaKeyFor(base64EncodedSecret);
 
-    Date issuedAt = new Date();
-    Date expiration = new Date(new Date().getTime() + Duration.ofMinutes(5).toMillis());
-
-    String refreshToken =
-        tokenProvider.generateRefreshToken(jti, subject, issuedAt, expiration, secret);
     // when
-    Claims payload =
+    Claims result =
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(refreshToken).getPayload();
 
     // then
-    Assertions.assertThat(payload.getSubject()).isEqualTo(subject);
+    Assertions.assertThat(result)
+        .hasFieldOrPropertyWithValue("id", jti)
+        .hasFieldOrPropertyWithValue("subject", email);
   }
 
   @DisplayName("extractClaims(): Claims 추출 테스트")
@@ -111,6 +119,7 @@ class TokenProviderTest {
     // then
     Assertions.assertThat(claims.getSubject()).isEqualTo(jwtFactory.getSubject());
     Assertions.assertThat(claims.getExpiration()).isBefore(jwtFactory.getExpiration());
+    //  @Dis
   }
 
   @DisplayName("extractClaimsThrowSignatureException(): 유효하지 않은 토큰일때 SignautreException을 던진다.")
@@ -133,5 +142,19 @@ class TokenProviderTest {
     // when & then
     Assertions.assertThatThrownBy(() -> tokenProvider.extractClaims(token))
         .isInstanceOf(ExpiredJwtException.class);
+  }
+
+  @DisplayName("refreshExpirationSeconds(): ")
+  @Test
+  void refreshExpirationSeconds() {
+    // given
+    int refreshTokenMinutes = 5;
+    jwtProperties.setRefreshTokenExpirationMinutes(refreshTokenMinutes);
+
+    // when
+    Integer result = tokenProvider.refreshExpirationSeconds();
+
+    // then
+    Assertions.assertThat(result).isEqualTo(refreshTokenMinutes * 60);
   }
 }
