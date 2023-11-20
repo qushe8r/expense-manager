@@ -72,6 +72,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   private void saveRefreshTokenToRedis(String jti, String refreshToken, MemberDetails principal) {
     refreshTokenRepository.save(
         new RefreshToken(
-            jti, refreshToken, principal.getUsername(), tokenProvider.refreshExpiration()));
+            jti,
+            refreshToken,
+            principal.getUsername(),
+            Long.valueOf(tokenProvider.refreshExpirationSeconds())));
   }
 }

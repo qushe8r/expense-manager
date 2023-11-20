@@ -149,6 +149,6 @@ class JwtAuthenticationFilterTest {
         .generateBearerAccessToken(Mockito.anyString(), Mockito.eq("username"), Mockito.anyMap());
     Mockito.verify(tokenProvider, Mockito.times(1))
         .generateRefreshToken(Mockito.anyString(), Mockito.eq("username"));
-    Mockito.verify(tokenProvider, Mockito.times(1)).refreshExpirationSeconds();
+    Mockito.verify(tokenProvider, Mockito.times(2)).refreshExpirationSeconds();
   }
 }
