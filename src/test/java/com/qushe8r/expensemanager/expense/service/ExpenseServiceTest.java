@@ -9,6 +9,7 @@ import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.expense.exception.ExpenseNotFoundException;
 import com.qushe8r.expensemanager.expense.mapper.ExpenseMapper;
+import com.qushe8r.expensemanager.expense.repository.ExpenseQueryDslRepository;
 import com.qushe8r.expensemanager.expense.repository.ExpenseRepository;
 import com.qushe8r.expensemanager.matcher.ExpenseMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
@@ -31,6 +32,8 @@ class ExpenseServiceTest {
   @Spy private ExpenseMapper expenseMapper;
 
   @Mock private ExpenseRepository expenseRepository;
+
+  @Mock private ExpenseQueryDslRepository expenseQueryDslRepository;
 
   @InjectMocks private ExpenseService expenseService;
 
@@ -126,6 +129,52 @@ class ExpenseServiceTest {
     // when
     Assertions.assertThatThrownBy(
             () -> expenseService.modifyExpense(memberId, memberCategory, expenseId, patchExpense))
+        .isInstanceOf(ExpenseNotFoundException.class);
+  }
+
+  @DisplayName("getExpense(): 조회에 성공하면 response를 반환한다")
+  @Test
+  void getExpense() {
+    // given
+    Long memberId = 1L;
+    Long expenseId = 1L;
+    Long amount = 10000L;
+    String memo = "김밥";
+    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
+
+    String categoryName = "카테고리";
+
+    Category category = new Category(1L, categoryName);
+    MemberCategory memberCategory = new MemberCategory(1L, null, category);
+    Expense expense = new Expense(expenseId, amount, memo, expenseAt, memberCategory);
+
+    BDDMockito.given(expenseQueryDslRepository.query(memberId, expenseId))
+        .willReturn(Optional.of(expense));
+
+    // when
+    ExpenseResponse result = expenseService.getExpense(memberId, expenseId);
+
+    // then
+    Assertions.assertThat(result)
+        .hasFieldOrPropertyWithValue("expenseId", expenseId)
+        .hasFieldOrPropertyWithValue("amount", amount)
+        .hasFieldOrPropertyWithValue("memo", memo)
+        .hasFieldOrPropertyWithValue("expenseAt", expenseAt)
+        .hasFieldOrPropertyWithValue("categoryName", categoryName);
+  }
+
+  @DisplayName("getExpenseExpenseNotFoundException(): 조회 결과가 없으면 예외가 발생한다")
+  @Test
+  void getExpenseExpenseNotFoundException() {
+    // given
+    Long memberId = 1L;
+    Long expenseId = 1L;
+
+    BDDMockito.given(expenseQueryDslRepository.query(memberId, expenseId))
+        .willReturn(Optional.empty());
+
+    // when
+    Assertions.assertThatThrownBy(() -> expenseService.getExpense(memberId, expenseId))
         .isInstanceOf(ExpenseNotFoundException.class);
   }
 
