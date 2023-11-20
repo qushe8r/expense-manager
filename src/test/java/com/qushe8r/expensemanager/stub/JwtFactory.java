@@ -18,7 +18,7 @@ public class JwtFactory {
 
   private String jti = "jti";
 
-  private String subject = "test@email";
+  private String subject = "test@email.com";
 
   private Date issuedAt = new Date();
 
