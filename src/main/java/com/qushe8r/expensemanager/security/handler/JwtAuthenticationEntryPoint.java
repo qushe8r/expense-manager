@@ -30,6 +30,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
       throws IOException {
     JwtExceptionCode exceptionCode =
         (JwtExceptionCode) request.getAttribute(JwtVerificationFilter.EXCEPTION);
+    if (exceptionCode == null) {
+      exceptionCode = JwtExceptionCode.TOKEN_NOT_FOUND;
+    }
     responseWithJson(response, exceptionCode);
   }
 

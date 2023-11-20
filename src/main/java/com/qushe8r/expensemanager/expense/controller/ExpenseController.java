@@ -49,7 +49,7 @@ public class ExpenseController {
   @PatchMapping("/{expenseId}")
   public ResponseEntity<SingleResponse<ExpenseResponse>> modifyExpense(
       @AuthenticationPrincipal MemberDetails memberDetails,
-      @PathVariable Long expenseId,
+      @PathVariable @Positive Long expenseId,
       @RequestBody PatchExpense dto) {
     ExpenseResponse response = expenseUpdateUseCase.modifyExpense(memberDetails, expenseId, dto);
     return ResponseEntity.ok(new SingleResponse<>(response));

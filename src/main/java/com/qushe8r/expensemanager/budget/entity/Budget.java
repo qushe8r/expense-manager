@@ -16,10 +16,8 @@ import java.time.YearMonth;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "budget")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

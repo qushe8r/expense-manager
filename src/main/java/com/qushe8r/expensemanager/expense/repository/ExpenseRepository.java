@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-  @Query("SELECT e FROM Expense e JOIN FETCH e.memberCategory mc WHERE e.id = :expenseId")
-  Optional<Expense> findExpenseMemberCategoryById(Long expenseId);
+  @Query(
+      "SELECT e FROM Expense e JOIN FETCH e.memberCategory mc WHERE e.id = :expenseId AND mc.member.id = :memberId")
+  Optional<Expense> findExpenseMemberCategoryById(Long memberId, Long expenseId);
 
   @Query(
       "SELECT e FROM Expense e WHERE e.memberCategory.member.id = :memberId AND e.id = :expenseId")

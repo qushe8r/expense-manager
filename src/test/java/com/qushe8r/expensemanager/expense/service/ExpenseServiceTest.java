@@ -70,6 +70,7 @@ class ExpenseServiceTest {
   void modifyExpense() {
     // given
     Long expenseId = 1L;
+    Long memberId = 1L;
     Long categoryId = 1L;
     Long amount = 12000L;
     String memo = "김치찌개";
@@ -80,7 +81,7 @@ class ExpenseServiceTest {
         new MemberCategory(categoryId, new Member(1L), new Category(1L, categoryName));
     PatchExpense patchExpense = new PatchExpense(amount, memo, expenseAt, categoryId);
 
-    BDDMockito.given(expenseRepository.findExpenseMemberCategoryById(expenseId))
+    BDDMockito.given(expenseRepository.findExpenseMemberCategoryById(memberId, expenseId))
         .willReturn(
             Optional.of(
                 new Expense(
@@ -91,7 +92,8 @@ class ExpenseServiceTest {
                     memberCategory)));
 
     // when
-    ExpenseResponse result = expenseService.modifyExpense(memberCategory, expenseId, patchExpense);
+    ExpenseResponse result =
+        expenseService.modifyExpense(memberId, memberCategory, expenseId, patchExpense);
 
     // then
     Assertions.assertThat(result)
@@ -107,6 +109,7 @@ class ExpenseServiceTest {
   void modifyExpenseExpenseNotFoundException() {
     // given
     Long expenseId = 1L;
+    Long memberId = 1L;
     Long categoryId = 1L;
     Long amount = 12000L;
     String memo = "김치찌개";
@@ -117,12 +120,12 @@ class ExpenseServiceTest {
         new MemberCategory(categoryId, new Member(1L), new Category(1L, categoryName));
     PatchExpense patchExpense = new PatchExpense(amount, memo, expenseAt, categoryId);
 
-    BDDMockito.given(expenseRepository.findExpenseMemberCategoryById(expenseId))
+    BDDMockito.given(expenseRepository.findExpenseMemberCategoryById(memberId, expenseId))
         .willReturn(Optional.empty());
 
     // when
     Assertions.assertThatThrownBy(
-            () -> expenseService.modifyExpense(memberCategory, expenseId, patchExpense))
+            () -> expenseService.modifyExpense(memberId, memberCategory, expenseId, patchExpense))
         .isInstanceOf(ExpenseNotFoundException.class);
   }
 

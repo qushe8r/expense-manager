@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter(AccessLevel.PRIVATE)
 @Entity
 @Table(name = "expense")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

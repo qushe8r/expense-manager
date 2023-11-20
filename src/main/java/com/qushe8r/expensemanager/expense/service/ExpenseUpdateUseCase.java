@@ -1,6 +1,7 @@
 package com.qushe8r.expensemanager.expense.service;
 
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.category.service.CategoryService;
 import com.qushe8r.expensemanager.category.service.MemberCategoryService;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ExpenseUpdateUseCase {
 
+  private final CategoryService categoryService;
+
   private final MemberCategoryService memberCategoryService;
 
   private final ExpenseService expenseService;
@@ -20,9 +23,10 @@ public class ExpenseUpdateUseCase {
   @Transactional
   public ExpenseResponse modifyExpense(
       MemberDetails memberDetails, Long expenseId, PatchExpense dto) {
+    categoryService.validateCategoryByIdOrElseThrow(dto.categoryId());
     MemberCategory memberCategory =
         memberCategoryService.findByMemberCategoryOrElseSave(
             memberDetails.getId(), dto.categoryId());
-    return expenseService.modifyExpense(memberCategory, expenseId, dto);
+    return expenseService.modifyExpense(memberDetails.getId(), memberCategory, expenseId, dto);
   }
 }

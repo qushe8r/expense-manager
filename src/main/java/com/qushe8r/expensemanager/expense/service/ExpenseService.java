@@ -29,10 +29,10 @@ public class ExpenseService {
 
   @Transactional
   public ExpenseResponse modifyExpense(
-      MemberCategory memberCategory, Long expenseId, PatchExpense dto) {
+      Long memberId, MemberCategory memberCategory, Long expenseId, PatchExpense dto) {
     Expense expense =
         expenseRepository
-            .findExpenseMemberCategoryById(expenseId)
+            .findExpenseMemberCategoryById(memberId, expenseId)
             .orElseThrow(ExpenseNotFoundException::new);
     expense.modify(dto, memberCategory);
     return expenseMapper.toResponse(expense);
