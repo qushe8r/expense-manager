@@ -19,6 +19,9 @@ public class Validator {
   }
 
   public static void validateAmount(Long min, Long max) {
+    if (min == null || max == null) {
+      return;
+    }
     if (min > max) {
       throw new ValidateRangeException();
     }
