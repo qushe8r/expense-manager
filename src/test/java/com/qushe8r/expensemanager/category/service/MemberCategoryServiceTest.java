@@ -5,6 +5,7 @@ import com.qushe8r.expensemanager.category.dto.GlobalTotalsExpenseResponse;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.category.mapper.MemberCategoryMapper;
+import com.qushe8r.expensemanager.category.repository.MemberCategoryQueryDslRepository;
 import com.qushe8r.expensemanager.category.repository.MemberCategoryRepository;
 import com.qushe8r.expensemanager.common.exception.ValidateDurationException;
 import com.qushe8r.expensemanager.common.exception.ValidateEndBeforeStartException;
@@ -36,6 +37,8 @@ class MemberCategoryServiceTest {
   @Spy private MemberCategoryMapper memberCategoryMapper;
 
   @Mock private MemberCategoryRepository memberCategoryRepository;
+
+  @Mock private MemberCategoryQueryDslRepository memberCategoryQueryDslRepository;
 
   @InjectMocks private MemberCategoryService memberCategoryService;
 
@@ -96,9 +99,11 @@ class MemberCategoryServiceTest {
     // given
     LocalDate start = LocalDate.of(2023, 11, 1);
     LocalDate end = LocalDate.of(2023, 11, 30);
+    Long categoryId = 1L;
     Long min = 10000L;
     Long max = 50000L;
-    Category category = new Category(1L, "식사");
+    String categoryName = "식사";
+    Category category = new Category(categoryId, categoryName);
     String memo = "김치찌개";
     Long amount = 10000L;
     Long expenseId = 1L;
@@ -110,17 +115,19 @@ class MemberCategoryServiceTest {
     MemberCategory memberCategory = new MemberCategory(1L, member, category, List.of(expense));
 
     BDDMockito.given(
-            memberCategoryRepository.findCategoriesByAmountRangeAndDateRange(
+            memberCategoryQueryDslRepository.query(
                 memberDetails.getId(),
                 start.atTime(LocalTime.MIN),
                 end.atTime(LocalTime.MAX),
+                categoryId,
                 min,
                 max))
         .willReturn(List.of(memberCategory));
 
     // when
     GlobalTotalsExpenseResponse result =
-        memberCategoryService.getCategorizedExpense(memberDetails, start, end, min, max);
+        memberCategoryService.getCategorizedExpense(
+            memberDetails, start, end, categoryId, min, max);
 
     // then
     List<CategoryTotalsExpenseResponse> categories = result.categories();
@@ -139,11 +146,12 @@ class MemberCategoryServiceTest {
         .hasFieldOrPropertyWithValue("amount", amount)
         .hasFieldOrPropertyWithValue("memo", memo)
         .hasFieldOrPropertyWithValue("expenseAt", expenseAt);
-    Mockito.verify(memberCategoryRepository, Mockito.times(1))
-        .findCategoriesByAmountRangeAndDateRange(
+    Mockito.verify(memberCategoryQueryDslRepository, Mockito.times(1))
+        .query(
             memberDetails.getId(),
             start.atTime(LocalTime.MIN),
             end.atTime(LocalTime.MAX),
+            categoryId,
             min,
             max);
   }
@@ -154,13 +162,16 @@ class MemberCategoryServiceTest {
     // given
     LocalDate start = LocalDate.of(2023, 11, 30);
     LocalDate end = LocalDate.of(2023, 11, 1);
+    Long categoryId = 1L;
     Long min = 10000L;
     Long max = 50000L;
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
     // when & then
     Assertions.assertThatThrownBy(
-            () -> memberCategoryService.getCategorizedExpense(memberDetails, start, end, min, max))
+            () ->
+                memberCategoryService.getCategorizedExpense(
+                    memberDetails, start, end, categoryId, min, max))
         .isInstanceOf(ValidateEndBeforeStartException.class);
   }
 
@@ -170,13 +181,16 @@ class MemberCategoryServiceTest {
     // given
     LocalDate start = LocalDate.of(2023, 11, 1);
     LocalDate end = LocalDate.of(2023, 12, 10);
+    Long categoryId = 1L;
     Long min = 10000L;
     Long max = 50000L;
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
     // when & then
     Assertions.assertThatThrownBy(
-            () -> memberCategoryService.getCategorizedExpense(memberDetails, start, end, min, max))
+            () ->
+                memberCategoryService.getCategorizedExpense(
+                    memberDetails, start, end, categoryId, min, max))
         .isInstanceOf(ValidateDurationException.class);
   }
 
@@ -186,13 +200,16 @@ class MemberCategoryServiceTest {
     // given
     LocalDate start = LocalDate.of(2023, 11, 1);
     LocalDate end = LocalDate.of(2023, 11, 30);
+    Long categoryId = 1L;
     Long min = 50000L;
     Long max = 10000L;
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
 
     // when & then
     Assertions.assertThatThrownBy(
-            () -> memberCategoryService.getCategorizedExpense(memberDetails, start, end, min, max))
+            () ->
+                memberCategoryService.getCategorizedExpense(
+                    memberDetails, start, end, categoryId, min, max))
         .isInstanceOf(ValidateRangeException.class);
   }
 }
