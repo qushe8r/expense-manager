@@ -143,12 +143,14 @@ class CategoryControllerTest {
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
     LocalDate start = LocalDate.of(2023, 11, 1);
     LocalDate end = LocalDate.of(2023, 11, 30);
+    Long categoryId = 1L;
     Long min = 10000L;
     Long max = 50000L;
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("start", start.toString());
     params.add("end", end.toString());
+    params.add("categoryId", String.valueOf(categoryId));
     params.add("min", String.valueOf(min));
     params.add("max", String.valueOf(max));
 
@@ -159,6 +161,7 @@ class CategoryControllerTest {
                 Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
                 Mockito.eq(start),
                 Mockito.eq(end),
+                Mockito.eq(categoryId),
                 Mockito.eq(min),
                 Mockito.eq(max)))
         .willReturn(globalTotalsExpenseResponse);

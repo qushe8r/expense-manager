@@ -4,6 +4,7 @@ import com.qushe8r.expensemanager.category.dto.GlobalTotalsExpenseResponse;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
 import com.qushe8r.expensemanager.category.mapper.MemberCategoryMapper;
+import com.qushe8r.expensemanager.category.repository.MemberCategoryQueryDslRepository;
 import com.qushe8r.expensemanager.category.repository.MemberCategoryRepository;
 import com.qushe8r.expensemanager.common.utils.Validator;
 import com.qushe8r.expensemanager.member.entity.Member;
@@ -24,6 +25,8 @@ public class MemberCategoryService {
 
   private final MemberCategoryRepository memberCategoryRepository;
 
+  private final MemberCategoryQueryDslRepository memberCategoryQueryDslRepository;
+
   @Transactional
   public MemberCategory findByMemberCategoryOrElseSave(Long memberId, Long categoryId) {
     return memberCategoryRepository
@@ -35,15 +38,21 @@ public class MemberCategoryService {
   }
 
   public GlobalTotalsExpenseResponse getCategorizedExpense(
-      MemberDetails memberDetails, LocalDate start, LocalDate end, Long min, Long max) {
+      MemberDetails memberDetails,
+      LocalDate start,
+      LocalDate end,
+      Long categoryId,
+      Long min,
+      Long max) {
     Validator.validateDate(start, end);
     Validator.validateAmount(min, max);
 
     List<MemberCategory> memberCategories =
-        memberCategoryRepository.findCategoriesByAmountRangeAndDateRange(
+        memberCategoryQueryDslRepository.query(
             memberDetails.getId(),
             start.atTime(LocalTime.MIN),
             end.atTime(LocalTime.MAX),
+            categoryId,
             min,
             max);
 

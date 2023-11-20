@@ -69,12 +69,14 @@ class CategoryControllerReadIntegrationTest {
 
     LocalDate start = LocalDate.of(2023, 11, 1);
     LocalDate end = LocalDate.of(2023, 11, 30);
+    Long categoryId = 1L;
     Long min = 10000L;
     Long max = 50000L;
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("start", start.toString());
     params.add("end", end.toString());
+    params.add("categoryId", String.valueOf(categoryId));
     params.add("min", String.valueOf(min));
     params.add("max", String.valueOf(max));
 
