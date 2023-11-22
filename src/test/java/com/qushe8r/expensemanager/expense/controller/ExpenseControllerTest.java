@@ -29,6 +29,9 @@ import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -94,7 +97,7 @@ class ExpenseControllerTest {
                 .string(HttpHeaders.LOCATION, EXPENSE_DEFAULT_URL + "/" + createdExpenseId))
         .andDo(
             MockMvcRestDocumentation.document(
-                "post-members",
+                "post-expenses",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                 HeaderDocumentation.responseHeaders(
@@ -231,13 +234,43 @@ class ExpenseControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.patch(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+            RestDocumentationRequestBuilders.patch(
+                    EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content));
 
     // then
-    actions.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk());
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "patch-expenses",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                RequestDocumentation.pathParameters(
+                    RequestDocumentation.parameterWithName("expenseId").description("지출 식별자")),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.OBJECT)
+                        .description("데이터"),
+                    PayloadDocumentation.fieldWithPath("data.expenseId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지출 식별자"),
+                    PayloadDocumentation.fieldWithPath("data.amount")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지출 금액"),
+                    PayloadDocumentation.fieldWithPath("data.memo")
+                        .type(JsonFieldType.STRING)
+                        .description("지출 메모"),
+                    PayloadDocumentation.fieldWithPath("data.expenseAt")
+                        .type(JsonFieldType.STRING)
+                        .description("예산 시점"),
+                    PayloadDocumentation.fieldWithPath("data.categoryName")
+                        .type(JsonFieldType.STRING)
+                        .description("지출 카테고리 이름"))));
+
     Mockito.verify(expenseUpdateUseCase, Mockito.times(1))
         .modifyExpense(
             Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
