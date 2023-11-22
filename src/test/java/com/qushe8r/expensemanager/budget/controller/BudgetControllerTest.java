@@ -29,6 +29,8 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -211,7 +213,25 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.amount").isNumber())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.amount").value(150000L))
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.month").isString())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data.month").value(month.toString()));
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.month").value(month.toString()))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "patch-budgets",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.OBJECT)
+                        .description("데이터"),
+                    PayloadDocumentation.fieldWithPath("data.budgetId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("예산 식별"),
+                    PayloadDocumentation.fieldWithPath("data.amount")
+                        .type(JsonFieldType.NUMBER)
+                        .description("예산 금액"),
+                    PayloadDocumentation.fieldWithPath("data.month")
+                        .type(JsonFieldType.STRING)
+                        .description("예산 시점"))));
   }
 
   @DisplayName("modifyBudgetBudgetNotFoundException(): 예산을 찾을 수 없습니다.")
