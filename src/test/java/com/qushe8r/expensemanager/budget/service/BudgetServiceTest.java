@@ -202,9 +202,7 @@ class BudgetServiceTest {
             new BudgetRecommendationRate("카테고리4", 0.20),
             new BudgetRecommendationRate("카테고리5", 0.02),
             new BudgetRecommendationRate("카테고리6", 0.07),
-            new BudgetRecommendationRate("기타", 0.08)
-        );
-
+            new BudgetRecommendationRate("기타", 0.08));
 
     BDDMockito.given(budgetRecommendationRepository.getRecommendation()).willReturn(rates);
 

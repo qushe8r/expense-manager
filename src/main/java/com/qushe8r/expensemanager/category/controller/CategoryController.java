@@ -59,7 +59,8 @@ public class CategoryController {
       @RequestParam(required = false) @Positive Long min,
       @RequestParam(required = false) @Positive Long max) {
     GlobalTotalsExpenseResponse response =
-        memberCategoryService.getCategorizedExpense(memberDetails, start, end, categoryId, min, max);
+        memberCategoryService.getCategorizedExpense(
+            memberDetails, start, end, categoryId, min, max);
     return ResponseEntity.ok(new SingleResponse<>(response));
   }
 }
