@@ -254,6 +254,13 @@ class ExpenseControllerTest {
                 "patch-expenses",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("amount").description("지출 금액").optional(),
+                    PayloadDocumentation.fieldWithPath("memo").description("지출 메모").optional(),
+                    PayloadDocumentation.fieldWithPath("expenseAt").description("지출 시점").optional(),
+                    PayloadDocumentation.fieldWithPath("categoryId")
+                        .description("카테고리 식별자")
+                        .optional()),
                 RequestDocumentation.pathParameters(
                     RequestDocumentation.parameterWithName("expenseId").description("지출 식별자")),
                 PayloadDocumentation.responseFields(
