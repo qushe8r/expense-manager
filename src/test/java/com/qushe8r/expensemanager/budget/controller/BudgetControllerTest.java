@@ -90,6 +90,10 @@ class BudgetControllerTest {
                 "post-budgets",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("amount").description("예산 금액"),
+                    PayloadDocumentation.fieldWithPath("month").description("예산 일자"),
+                    PayloadDocumentation.fieldWithPath("categoryId").description("예산 카테고리 식별자")),
                 HeaderDocumentation.responseHeaders(
                     HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
                         .description("리소스 위치"))));
