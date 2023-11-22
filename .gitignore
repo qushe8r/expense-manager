@@ -97,3 +97,6 @@ $RECYCLE.BIN/
 
 ### Environment ###
 **/src/**/resources/*.yml
+
+### QueryDsl ###
+**/src/**/generated
