@@ -225,6 +225,8 @@ class BudgetControllerTest {
                 "patch-budgets",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("amount").description("예산 금액")),
                 RequestDocumentation.pathParameters(
                     RequestDocumentation.parameterWithName("budgetId").description("예산 식별자")),
                 PayloadDocumentation.responseFields(
