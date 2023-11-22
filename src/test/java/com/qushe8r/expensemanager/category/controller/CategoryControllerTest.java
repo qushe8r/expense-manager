@@ -220,8 +220,43 @@ class CategoryControllerTest {
         .andExpect(
             MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].memo").isString())
         .andExpect(
-            MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].expenseAt")
-                .isString());
+            MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].expenseAt").isString())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-categories",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.OBJECT)
+                        .description("데이터"),
+                    PayloadDocumentation.fieldWithPath("data.globalTotals")
+                        .type(JsonFieldType.NUMBER)
+                        .description("모든 카테고리 총합"),
+                    PayloadDocumentation.fieldWithPath("data.categories")
+                        .type(JsonFieldType.ARRAY)
+                        .description("카테고리 목록"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].categoryName")
+                        .type(JsonFieldType.STRING)
+                        .description("카테고리 이름"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].categoryTotals")
+                        .type(JsonFieldType.NUMBER)
+                        .description("카테고리 총합"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses")
+                        .type(JsonFieldType.ARRAY)
+                        .description("카테고리 별 지출 목록"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].expenseId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지출 식별자"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].amount")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지출 금액"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].memo")
+                        .type(JsonFieldType.STRING)
+                        .description("지출 메모"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].expenseAt")
+                        .type(JsonFieldType.STRING)
+                        .description("지출 시기"))));
   }
 
   @DisplayName("getCategorizedExpenseMinNotPositive(): min이 양의 정수가 아니면 에러가 발생한다.")
