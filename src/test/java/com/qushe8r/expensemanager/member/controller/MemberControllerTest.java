@@ -1,6 +1,5 @@
 package com.qushe8r.expensemanager.member.controller;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
 import com.qushe8r.expensemanager.matcher.PostMemberMatcher;
