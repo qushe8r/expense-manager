@@ -28,9 +28,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -317,13 +319,20 @@ class BudgetControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.delete(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+            RestDocumentationRequestBuilders.delete(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
 
     // then
     actions
         .andDo(MockMvcResultHandlers.print())
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
+        .andExpect(MockMvcResultMatchers.status().isNoContent())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "delete-budgets",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                RequestDocumentation.pathParameters(
+                    RequestDocumentation.parameterWithName("budgetId").description("예산 식별자"))));
   }
 }
