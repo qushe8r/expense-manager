@@ -93,6 +93,8 @@ class CategoryControllerTest {
                 "post-categories",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("name").description("카테고리 이름")),
                 HeaderDocumentation.responseHeaders(
                     HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
                         .description("리소스 위치"))));
