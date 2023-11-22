@@ -1,0 +1,213 @@
+= Expense-Manager
+:sectnums:
+:toc: left
+:toclevels: 4
+:toc-title: Table of Contents
+:source-highlighter: prettify
+
+Sim Hyunbo <Qushe8r@gmail.com>
+
+v1.0.0, 2023.11.23
+
+***
+== Member
+=== 회원 등록
+
+.curl-request
+include::{snippets}/post-members/curl-request.adoc[]
+
+.http-request
+include::{snippets}/post-members/http-request.adoc[]
+
+.request-body
+include::{snippets}/post-members/request-body.adoc[]
+
+.request-fields
+include::{snippets}/post-members/request-fields.adoc[]
+
+.http-response
+include::{snippets}/post-members/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-members/response-headers.adoc[]
+
+== Category
+=== 카테고리 등록
+
+.curl-request
+include::{snippets}/post-categories/curl-request.adoc[]
+
+.http-request
+include::{snippets}/post-categories/http-request.adoc[]
+
+.request-body
+include::{snippets}/post-categories/request-body.adoc[]
+
+.request-fields
+include::{snippets}/post-categories/request-fields.adoc[]
+
+.http-response
+include::{snippets}/post-categories/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-categories/response-headers.adoc[]
+
+=== 카테고리 목록 조회
+
+.curl-request
+include::{snippets}/get-categories/curl-request.adoc[]
+
+.http-request
+include::{snippets}/get-categories/http-request.adoc[]
+
+.http-response
+include::{snippets}/get-categories/http-response.adoc[]
+
+.response-body
+include::{snippets}/get-categories/response-body.adoc[]
+
+.response-fields
+include::{snippets}/get-categories/response-fields.adoc[]
+
+=== 카테고리 별 지출 조회
+
+.curl-request
+include::{snippets}/get-categorized-expenses/curl-request.adoc[]
+
+.http-request
+include::{snippets}/get-categorized-expenses/http-request.adoc[]
+
+.query-parameters
+include::{snippets}/get-categorized-expenses/query-parameters.adoc[]
+
+.http-response
+include::{snippets}/get-categorized-expenses/http-response.adoc[]
+
+.response-body
+include::{snippets}/get-categorized-expenses/response-body.adoc[]
+
+.response-fields
+include::{snippets}/get-categorized-expenses/response-fields.adoc[]
+
+== Budget
+=== 예산 등록
+
+.curl-request
+include::{snippets}/post-budgets/curl-request.adoc[]
+
+.http-request
+include::{snippets}/post-budgets/http-request.adoc[]
+
+.request-body
+include::{snippets}/post-budgets/request-body.adoc[]
+
+.request-fields
+include::{snippets}/post-budgets/request-fields.adoc[]
+
+.http-response
+include::{snippets}/post-budgets/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-budgets/response-headers.adoc[]
+
+=== 예산 수정
+
+.curl-request
+include::{snippets}/patch-budgets/curl-request.adoc[]
+
+.http-request
+include::{snippets}/patch-budgets/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/patch-budgets/path-parameters.adoc[]
+
+.request-body
+include::{snippets}/patch-budgets/request-body.adoc[]
+
+.request-fields
+include::{snippets}/patch-budgets/request-fields.adoc[]
+
+.http-response
+include::{snippets}/patch-budgets/http-response.adoc[]
+
+.response-body
+include::{snippets}/patch-budgets/response-body.adoc[]
+
+.response-fields
+include::{snippets}/patch-budgets/response-fields.adoc[]
+
+=== 예산 삭제
+
+.curl-request
+include::{snippets}/delete-budgets/curl-request.adoc[]
+
+.http-request
+include::{snippets}/delete-budgets/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/delete-budgets/path-parameters.adoc[]
+
+.http-response
+include::{snippets}/delete-budgets/http-response.adoc[]
+
+
+== Expense
+=== 예산 등록
+
+.curl-request
+include::{snippets}/post-expenses/curl-request.adoc[]
+
+.http-request
+include::{snippets}/post-expenses/http-request.adoc[]
+
+.request-body
+include::{snippets}/post-expenses/request-body.adoc[]
+
+.request-fields
+include::{snippets}/post-expenses/request-fields.adoc[]
+
+.http-response
+include::{snippets}/post-expenses/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-expenses/response-headers.adoc[]
+
+=== 예산
+
+.curl-request
+include::{snippets}/patch-expenses/curl-request.adoc[]
+
+.http-request
+include::{snippets}/patch-expenses/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/patch-expenses/path-parameters.adoc[]
+
+.request-body
+include::{snippets}/patch-expenses/request-body.adoc[]
+
+.request-fields
+include::{snippets}/patch-expenses/request-fields.adoc[]
+
+.http-response
+include::{snippets}/patch-expenses/http-response.adoc[]
+
+.response-body
+include::{snippets}/patch-expenses/response-body.adoc[]
+
+.response-fields
+include::{snippets}/patch-expenses/response-fields.adoc[]
+
+=== 지출 삭제
+
+.curl-request
+include::{snippets}/delete-expenses/curl-request.adoc[]
+
+.http-request
+include::{snippets}/delete-expenses/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/delete-expenses/path-parameters.adoc[]
+
+.http-response
+include::{snippets}/delete-expenses/http-response.adoc[]
