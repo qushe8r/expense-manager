@@ -100,6 +100,11 @@ class ExpenseControllerTest {
                 "post-expenses",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("amount").description("지출 금액"),
+                    PayloadDocumentation.fieldWithPath("memo").description("지출 메모"),
+                    PayloadDocumentation.fieldWithPath("expenseAt").description("지출 시점"),
+                    PayloadDocumentation.fieldWithPath("categoryId").description("카테고리 식별자")),
                 HeaderDocumentation.responseHeaders(
                     HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
                         .description("리소스 위치"))));
