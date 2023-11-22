@@ -56,7 +56,7 @@ public class MemberCategoryQueryDslRepository {
   }
 
   private BooleanExpression categoryNameEq(Long categoryId) {
-    return categoryId == null ? null :CATEGORY.id.eq(categoryId);
+    return categoryId == null ? null : CATEGORY.id.eq(categoryId);
   }
 
   private BooleanExpression expenseAtLoe(LocalDateTime end) {
