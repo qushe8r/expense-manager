@@ -73,7 +73,7 @@ class BudgetControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.post(BUDGET_DEFAULT_URL)
+            RestDocumentationRequestBuilders.post(BUDGET_DEFAULT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content));
@@ -201,7 +201,7 @@ class BudgetControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.patch(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
+            RestDocumentationRequestBuilders.patch(BUDGET_DEFAULT_URL + "/{budgetId}", budgetId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content));
@@ -221,6 +221,8 @@ class BudgetControllerTest {
                 "patch-budgets",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                RequestDocumentation.pathParameters(
+                    RequestDocumentation.parameterWithName("budgetId").description("예산 식별자")),
                 PayloadDocumentation.responseFields(
                     PayloadDocumentation.fieldWithPath("data")
                         .type(JsonFieldType.OBJECT)
