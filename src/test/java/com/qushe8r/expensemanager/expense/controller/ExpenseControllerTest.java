@@ -291,14 +291,21 @@ class ExpenseControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+            RestDocumentationRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
 
     // then
     actions
         .andDo(MockMvcResultHandlers.print())
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
+        .andExpect(MockMvcResultMatchers.status().isNoContent())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "delete-expenses",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                RequestDocumentation.pathParameters(
+                    RequestDocumentation.parameterWithName("expenseId").description("지출 식별자"))));
     Mockito.verify(expenseService, Mockito.times(1))
         .deleteExpense(memberDetails.getId(), expenseId);
   }
