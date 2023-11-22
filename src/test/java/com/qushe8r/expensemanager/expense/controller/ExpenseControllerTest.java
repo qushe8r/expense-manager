@@ -291,7 +291,8 @@ class ExpenseControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete(EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
+            RestDocumentationRequestBuilders.delete(
+                    EXPENSE_DEFAULT_URL + EXPENSE_PATH_PARAMETER, expenseId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
 
