@@ -20,6 +20,7 @@ import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -74,8 +75,10 @@ class MemberControllerTest {
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                 HeaderDocumentation.responseHeaders(
-                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
-                        .description("리소스 위치"))));
+                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION).description("리소스 위치")),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("email").description("회원 이메일"),
+                    PayloadDocumentation.fieldWithPath("password").description("회원 비밀번호"))));
   }
 
   @DisplayName("createMemberValidationEmail(): email 유효성 검사 실패")
