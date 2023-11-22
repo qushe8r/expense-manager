@@ -32,9 +32,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -200,7 +202,7 @@ class CategoryControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
+            RestDocumentationRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .params(params));
@@ -228,6 +230,18 @@ class CategoryControllerTest {
                 "get-categorized-expenses",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                RequestDocumentation.queryParameters(
+                    RequestDocumentation.parameterWithName("start").description("조회 시작 일자"),
+                    RequestDocumentation.parameterWithName("end").description("조회 종료 일자"),
+                    RequestDocumentation.parameterWithName("min")
+                        .description("조회 최소 금액")
+                        .optional(),
+                    RequestDocumentation.parameterWithName("max")
+                        .description("조회 최대 금액")
+                        .optional(),
+                    RequestDocumentation.parameterWithName("categoryId")
+                        .description("카테고리 식별자")
+                        .optional()),
                 PayloadDocumentation.responseFields(
                     PayloadDocumentation.fieldWithPath("data")
                         .type(JsonFieldType.OBJECT)
