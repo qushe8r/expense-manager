@@ -148,7 +148,7 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME))
         .andDo(
             MockMvcRestDocumentation.document(
-                "post-categories",
+                "get-categories",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                 PayloadDocumentation.responseFields(
@@ -223,7 +223,7 @@ class CategoryControllerTest {
             MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].expenseAt").isString())
         .andDo(
             MockMvcRestDocumentation.document(
-                "post-categories",
+                "get-categorized-expenses",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                 PayloadDocumentation.responseFields(
