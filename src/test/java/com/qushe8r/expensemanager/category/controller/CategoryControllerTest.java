@@ -33,6 +33,8 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -143,8 +145,22 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").isNumber())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name").isString())
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME));
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-categories",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.ARRAY)
+                        .description("데이터 목록"),
+                    PayloadDocumentation.fieldWithPath("data[].id")
+                        .type(JsonFieldType.NUMBER)
+                        .description("카테고리 식별자"),
+                    PayloadDocumentation.fieldWithPath("data[].name")
+                        .type(JsonFieldType.STRING)
+                        .description("카테고리 이름"))));
   }
 
   @DisplayName("getCategorizedExpense(): 조회 성공시 GlobalTotalsExpenseResponse(dto)를 반환한다.")
