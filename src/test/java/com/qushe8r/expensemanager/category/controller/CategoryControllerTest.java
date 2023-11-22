@@ -24,11 +24,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.headers.HeaderDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -39,6 +43,7 @@ import org.springframework.util.MultiValueMap;
 
 @WebMvcTest(CategoryController.class)
 @Import(TestSecurityConfig.class)
+@AutoConfigureRestDocs
 class CategoryControllerTest {
 
   private static final String CATEGORY_NAME = "카테고리";
@@ -80,7 +85,15 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(
             MockMvcResultMatchers.header()
-                .string(HttpHeaders.LOCATION, CATEGORY_DEFAULT_URL + "/" + createdCategoryId));
+                .string(HttpHeaders.LOCATION, CATEGORY_DEFAULT_URL + "/" + createdCategoryId))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-categories",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
+                        .description("리소스 위치"))));
   }
 
   @DisplayName("createCategoryValidationCategoryName(): category 이름 유효성 검사 실패")
