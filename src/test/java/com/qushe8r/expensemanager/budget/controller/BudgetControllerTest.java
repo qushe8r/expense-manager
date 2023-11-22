@@ -20,11 +20,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.headers.HeaderDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -33,6 +37,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(BudgetController.class)
 @Import(TestSecurityConfig.class)
+@AutoConfigureRestDocs
 class BudgetControllerTest {
 
   private static final String BUDGET_DEFAULT_URL = "/budgets";
@@ -75,7 +80,15 @@ class BudgetControllerTest {
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(
             MockMvcResultMatchers.header()
-                .string(HttpHeaders.LOCATION, BUDGET_DEFAULT_URL + "/" + createdBudgetId));
+                .string(HttpHeaders.LOCATION, BUDGET_DEFAULT_URL + "/" + createdBudgetId))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-budgets",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
+                        .description("리소스 위치"))));
   }
 
   @DisplayName("createBudget(): 예산이 null 이라면 실패한다")
