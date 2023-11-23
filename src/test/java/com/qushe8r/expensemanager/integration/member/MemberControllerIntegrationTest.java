@@ -2,7 +2,11 @@ package com.qushe8r.expensemanager.integration.member;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.config.DataSourceSelector;
+import com.qushe8r.expensemanager.member.dto.PatchPassword;
 import com.qushe8r.expensemanager.member.dto.PostMember;
+import com.qushe8r.expensemanager.security.jwt.JwtProperties;
+import com.qushe8r.expensemanager.security.jwt.TokenProvider;
+import com.qushe8r.expensemanager.stub.JwtFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +38,8 @@ class MemberControllerIntegrationTest {
   @Autowired private MockMvc mockMvc;
 
   @Autowired private ObjectMapper objectMapper;
+
+  @Autowired private JwtProperties jwtProperties;
 
   @Autowired private DataSourceSelector dataSourceSelector;
 
@@ -88,5 +94,28 @@ class MemberControllerIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("이미 존재하는 회원입니다."))
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @DisplayName("modifyPassword(): 입력값이 유효하면 성공한다.")
+  @Test
+  void modifyPassword() throws Exception {
+    // given
+    PatchPassword patchPassword = new PatchPassword("A*czkax8c!");
+    String content = objectMapper.writeValueAsString(patchPassword);
+    String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.patch(MEMBER_DEFAULT_URL + "/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TokenProvider.BEARER + accessToken)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk());
   }
 }
