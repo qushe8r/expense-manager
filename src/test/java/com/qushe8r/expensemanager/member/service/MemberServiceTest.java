@@ -1,8 +1,10 @@
 package com.qushe8r.expensemanager.member.service;
 
 import com.qushe8r.expensemanager.matcher.MemberMatcher;
+import com.qushe8r.expensemanager.member.dto.PatchPassword;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.member.exception.MemberAlreadyExistException;
 import com.qushe8r.expensemanager.member.exception.MemberNotFoundException;
 import com.qushe8r.expensemanager.member.mapper.MemberMapper;
@@ -115,6 +117,43 @@ class MemberServiceTest {
 
     // when & then
     Assertions.assertThatThrownBy(() -> memberService.validateMemberExistByEmailOrElseThrow(email))
+        .isInstanceOf(MemberNotFoundException.class);
+  }
+
+  @DisplayName("modifyPassword(): 정상적으로 비밀번호가 변경되면 아무런 응답도 없다.")
+  @Test
+  void modifyPassword() {
+    // given
+    Long memberId = 1L;
+    String newPassword = "newPassword";
+    String encodedNewPassword = "encodedNewPassword";
+    MemberDetails memberDetails = new MemberDetails(memberId, "test@email.com", "");
+    PatchPassword dto = new PatchPassword(newPassword);
+    Member member = new Member(memberId, "test@email.com", "oldPassword");
+
+    BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+    BDDMockito.given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+    // when
+    memberService.modifyPassword(memberDetails, dto);
+
+    // then
+    Assertions.assertThat(member.getPassword()).isEqualTo(encodedNewPassword);
+  }
+
+  @DisplayName("modifyPasswordMemberNotFoundException(): 회원 조회에 실패하면 에외가 발생한다")
+  @Test
+  void modifyPasswordMemberNotFoundException() {
+    // given
+    Long memberId = 1L;
+    String newPassword = "newPassword";
+    MemberDetails memberDetails = new MemberDetails(memberId, "test@email.com", "");
+    PatchPassword dto = new PatchPassword(newPassword);
+
+    BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+    // when & then
+    Assertions.assertThatThrownBy(() -> memberService.modifyPassword(memberDetails, dto))
         .isInstanceOf(MemberNotFoundException.class);
   }
 }

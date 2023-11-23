@@ -1,9 +1,14 @@
 package com.qushe8r.expensemanager.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
+import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
+import com.qushe8r.expensemanager.config.TestSecurityConfig;
+import com.qushe8r.expensemanager.matcher.MemberDetailsMatcher;
+import com.qushe8r.expensemanager.matcher.PatchPasswordMatcher;
 import com.qushe8r.expensemanager.matcher.PostMemberMatcher;
+import com.qushe8r.expensemanager.member.dto.PatchPassword;
 import com.qushe8r.expensemanager.member.dto.PostMember;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +18,9 @@ import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.headers.HeaderDocumentation;
@@ -27,7 +34,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTestWithoutSecurityConfig(MemberController.class)
+@WebMvcTest(MemberController.class)
+@Import(TestSecurityConfig.class)
 @AutoConfigureRestDocs
 class MemberControllerTest {
 
@@ -139,5 +147,40 @@ class MemberControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("password"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @WithMemberPrincipals
+  @Test
+  void modifyPassword() throws Exception {
+    // given
+    PatchPassword patchPassword = new PatchPassword("newPassword");
+    String content = objectMapper.writeValueAsString(patchPassword);
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
+    BDDMockito.doNothing()
+        .when(memberService)
+        .modifyPassword(
+            Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
+            Mockito.argThat(new PatchPasswordMatcher(patchPassword)));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.patch(MEMBER_DEFAULT_URL + "/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "patch-members-password",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("password").description("변경할 비밀번호"))));
   }
 }

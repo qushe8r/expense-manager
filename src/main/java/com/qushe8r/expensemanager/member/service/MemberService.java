@@ -1,7 +1,9 @@
 package com.qushe8r.expensemanager.member.service;
 
+import com.qushe8r.expensemanager.member.dto.PatchPassword;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.member.exception.MemberAlreadyExistException;
 import com.qushe8r.expensemanager.member.exception.MemberNotFoundException;
 import com.qushe8r.expensemanager.member.mapper.MemberMapper;
@@ -29,6 +31,15 @@ public class MemberService {
     Member rowMember = memberMapper.toEntity(dto, encodedPassword);
     Member saved = memberRepository.save(rowMember);
     return saved.getId();
+  }
+
+  @Transactional
+  public void modifyPassword(MemberDetails memberDetails, PatchPassword dto) {
+    Member member =
+        memberRepository.findById(memberDetails.getId()).orElseThrow(MemberNotFoundException::new);
+
+    String newPassword = passwordEncoder.encode(dto.password());
+    member.modifyPassword(newPassword);
   }
 
   private void validateMemberExistByEmailIfPresentThrow(String email) {
