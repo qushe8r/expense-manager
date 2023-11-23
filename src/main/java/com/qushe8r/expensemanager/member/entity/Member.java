@@ -48,4 +48,8 @@ public class Member {
     this.email = email;
     this.password = password;
   }
+
+  public void modifyPassword(String newPassword) {
+    this.password = newPassword;
+  }
 }
