@@ -12,9 +12,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.headers.HeaderDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -22,6 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTestWithoutSecurityConfig(MemberController.class)
+@AutoConfigureRestDocs
 class MemberControllerTest {
 
   private static final String EMAIL_EXAMPLE = "test@email.com";
@@ -50,7 +57,7 @@ class MemberControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.post(MEMBER_DEFAULT_URL)
+            RestDocumentationRequestBuilders.post(MEMBER_DEFAULT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content));
@@ -61,7 +68,17 @@ class MemberControllerTest {
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(
             MockMvcResultMatchers.header()
-                .string(HttpHeaders.LOCATION, "/members/" + createdMemberId));
+                .string(HttpHeaders.LOCATION, "/members/" + createdMemberId))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-members",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION).description("리소스 위치")),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("email").description("회원 이메일"),
+                    PayloadDocumentation.fieldWithPath("password").description("회원 비밀번호"))));
   }
 
   @DisplayName("createMemberValidationEmail(): email 유효성 검사 실패")
