@@ -16,7 +16,15 @@ public class MemberMatcher implements ArgumentMatcher<Member> {
     boolean isSameId = isSameId(left, right);
     boolean isSameEmail = left.getEmail().equals(right.getEmail());
     boolean isSamePassword = left.getPassword().equals(right.getPassword());
-    return isSameId && isSameEmail && isSamePassword;
+    boolean isSameEvaluationAlarm = left.getEvaluationAlarm().equals(right.getEvaluationAlarm());
+    boolean isSameRecommendationAlarm =
+        left.getRecommendationAlarm().equals(right.getRecommendationAlarm());
+
+    return isSameId
+        && isSameEmail
+        && isSamePassword
+        && isSameEvaluationAlarm
+        && isSameRecommendationAlarm;
   }
 
   private boolean isSameId(Member left, Member right) {

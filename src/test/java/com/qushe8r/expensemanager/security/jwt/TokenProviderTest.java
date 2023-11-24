@@ -37,7 +37,7 @@ class TokenProviderTest {
   void generateAccessTokenByMember() {
     // given
     String jti = "jti";
-    Member member = new Member(1L, "test@email.com", "password");
+    Member member = new Member(1L, "test@email.com", "password", false, false);
 
     byte[] base64EncodedSecret =
         Base64.getEncoder().encode(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));

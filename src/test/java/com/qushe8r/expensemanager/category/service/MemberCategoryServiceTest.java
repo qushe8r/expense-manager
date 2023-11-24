@@ -110,7 +110,7 @@ class MemberCategoryServiceTest {
     LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
 
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
-    Member member = new Member(1L, "test@email.com", "");
+    Member member = new Member(1L, "test@email.com", "", false, false);
     Expense expense = new Expense(expenseId, amount, memo, expenseAt, null);
     MemberCategory memberCategory = new MemberCategory(1L, member, category, List.of(expense));
 

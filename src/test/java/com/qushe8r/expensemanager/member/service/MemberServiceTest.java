@@ -42,7 +42,7 @@ class MemberServiceTest {
     String password = "password";
     String encodedPassword = "encodedPassword";
 
-    PostMember postMember = new PostMember(email, password);
+    PostMember postMember = new PostMember(email, password, false, false);
 
     BDDMockito.given(passwordEncoder.encode(password)).willReturn(encodedPassword);
 
@@ -50,8 +50,9 @@ class MemberServiceTest {
 
     BDDMockito.given(
             memberRepository.save(
-                Mockito.argThat(new MemberMatcher(new Member(email, encodedPassword)))))
-        .willReturn(new Member(expectedId, email, encodedPassword));
+                Mockito.argThat(
+                    new MemberMatcher(new Member(email, encodedPassword, false, false)))))
+        .willReturn(new Member(expectedId, email, encodedPassword, false, false));
 
     // when
     Long memberId = memberService.createMember(postMember);
@@ -61,7 +62,7 @@ class MemberServiceTest {
     Mockito.verify(passwordEncoder, Mockito.times(1)).encode(password);
     Mockito.verify(memberRepository, Mockito.times(1)).findByEmail(email);
     Mockito.verify(memberRepository, Mockito.times(1))
-        .save(Mockito.argThat(new MemberMatcher(new Member(email, encodedPassword))));
+        .save(Mockito.argThat(new MemberMatcher(new Member(email, encodedPassword, false, false))));
   }
 
   @DisplayName(
@@ -73,10 +74,10 @@ class MemberServiceTest {
     String password = "password";
     String encodedPassword = "encodedPassword";
 
-    PostMember postMember = new PostMember(email, password);
+    PostMember postMember = new PostMember(email, password, false, false);
 
     BDDMockito.given(memberRepository.findByEmail(email))
-        .willReturn(Optional.of(new Member(1L, email, encodedPassword)));
+        .willReturn(Optional.of(new Member(1L, email, encodedPassword, false, false)));
 
     // when & then
     Assertions.assertThatThrownBy(() -> memberService.createMember(postMember))
@@ -92,7 +93,7 @@ class MemberServiceTest {
     String email = "test@email.com";
     String password = "password";
 
-    Member member = new Member(memberId, email, password);
+    Member member = new Member(memberId, email, password, false, false);
 
     BDDMockito.given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
 
@@ -129,7 +130,7 @@ class MemberServiceTest {
     String encodedNewPassword = "encodedNewPassword";
     MemberDetails memberDetails = new MemberDetails(memberId, "test@email.com", "");
     PatchPassword dto = new PatchPassword(newPassword);
-    Member member = new Member(memberId, "test@email.com", "oldPassword");
+    Member member = new Member(memberId, "test@email.com", "oldPassword", false, false);
 
     BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
     BDDMockito.given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);

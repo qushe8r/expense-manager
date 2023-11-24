@@ -52,7 +52,7 @@ class MemberControllerIntegrationTest {
   @Test
   void createMember() throws Exception {
     // given
-    PostMember postMember = new PostMember(EMAIL_EXAMPLE, PASSWORD_EXAMPLE);
+    PostMember postMember = new PostMember(EMAIL_EXAMPLE, PASSWORD_EXAMPLE, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when
@@ -74,7 +74,7 @@ class MemberControllerIntegrationTest {
   @Test
   void createMemberMemberAlreadyExistsException() throws Exception {
     // given
-    PostMember postMember = new PostMember(EMAIL_EXISTS, PASSWORD_EXAMPLE);
+    PostMember postMember = new PostMember(EMAIL_EXISTS, PASSWORD_EXAMPLE, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when
@@ -114,8 +114,6 @@ class MemberControllerIntegrationTest {
                 .content(content));
 
     // then
-    actions
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(MockMvcResultMatchers.status().isOk());
+    actions.andDo(MockMvcResultHandlers.print()).andExpect(MockMvcResultMatchers.status().isOk());
   }
 }

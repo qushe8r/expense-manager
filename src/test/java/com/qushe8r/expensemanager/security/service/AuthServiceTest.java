@@ -53,7 +53,7 @@ class AuthServiceTest {
     Long memberId = 1L;
     String password = "encodedPassword";
 
-    Member member = new Member(memberId, email, password);
+    Member member = new Member(memberId, email, password, false, false);
 
     byte[] base64EncodedSecret =
         Base64.getEncoder().encode(JwtFactory.TEST_SECRET.getBytes(StandardCharsets.UTF_8));

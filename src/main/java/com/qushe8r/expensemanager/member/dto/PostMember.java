@@ -18,4 +18,6 @@ public record PostMember(
             regexp =
                 "^(?=.*\\d.*[\\W_]|.*[\\W_].*\\d|.*[a-zA-Z].*\\d|.*\\d.*[a-zA-Z]|.*[a-zA-Z].*[\\W_]|.*[\\W_][a-zA-Z]).+$",
             message = "숫자, 문자, 특수문자 중 2가지 이상을 포함해야 합니다.")
-        @NotNull String password) {}
+        @NotNull String password,
+    Boolean evaluationAlarm,
+    Boolean recommendationAlarm) {}

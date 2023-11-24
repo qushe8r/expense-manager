@@ -31,22 +31,38 @@ public class Member {
   @Column(nullable = false)
   private String password;
 
+  @Column(nullable = false)
+  private Boolean evaluationAlarm;
+
+  @Column(nullable = false)
+  private Boolean recommendationAlarm;
+
   @OneToMany(mappedBy = "member")
   private List<MemberCategory> memberCategories = new ArrayList<>();
 
-  public Member(Long id, String email, String password) {
+  public Member(
+      Long id,
+      String email,
+      String password,
+      Boolean evaluationAlarm,
+      Boolean recommendationAlarm) {
     this.id = id;
     this.email = email;
     this.password = password;
+    this.evaluationAlarm = evaluationAlarm;
+    this.recommendationAlarm = recommendationAlarm;
   }
 
   public Member(Long id) {
     this.id = id;
   }
 
-  public Member(String email, String password) {
+  public Member(
+      String email, String password, Boolean evaluationAlarm, Boolean recommendationAlarm) {
     this.email = email;
     this.password = password;
+    this.evaluationAlarm = evaluationAlarm;
+    this.recommendationAlarm = recommendationAlarm;
   }
 
   public void modifyPassword(String newPassword) {
