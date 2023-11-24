@@ -20,14 +20,14 @@ public class DailyExpenseRecommendationInformationRepository {
         .createQuery(
             """
                 SELECT new com.qushe8r.expensemanager.notification.recommendation.dto.
-                DailyExpenseRecommendationInformation(t1.categoryName, b.amount, t1.expense)
-                FROM (SELECT SUM(e.amount) as expense, mc.category.name as categoryName, mc.id as memberCategoryId
+                DailyExpenseRecommendationInformation(b.memberCategory.category.name, b.amount, ifnull(t1.expense,0))
+                FROM (SELECT SUM(e.amount) as expense, mc.id as memberCategoryId
                 FROM Expense e JOIN MemberCategory mc ON e.memberCategory.id = mc.id
                 WHERE mc.member.id = :memberId
                 AND e.expenseAt BETWEEN :start AND :end
                 GROUP BY mc.id) as t1
-                JOIN Budget b ON t1.memberCategoryId = b.memberCategory.id
-                WHERE b.month = :month
+                RIGHT JOIN Budget b ON t1.memberCategoryId = b.memberCategory.id
+                WHERE b.month = :month AND b.memberCategory.member.id = :memberId
                 """,
             DailyExpenseRecommendationInformation.class)
         .setParameter("memberId", memberId)
