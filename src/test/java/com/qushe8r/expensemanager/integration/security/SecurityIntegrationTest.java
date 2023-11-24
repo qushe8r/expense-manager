@@ -34,11 +34,11 @@ class SecurityIntegrationTest {
     dataSourceSelector.toWrite();
   }
 
-  @DisplayName("createMember(): 입력값이 유효하면 회원가입에 성공한다")
+  @DisplayName("login(): 입력값이 유효하면 로그인에 성공한다.")
   @Test
-  void createMember() throws Exception {
+  void login() throws Exception {
     // given
-    UsernamePassword usernamePassword = new UsernamePassword("test@email.com", "qazsedc12#");
+    UsernamePassword usernamePassword = new UsernamePassword("test@email.com", "password");
     String content = objectMapper.writeValueAsString(usernamePassword);
 
     // when

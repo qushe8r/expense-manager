@@ -77,7 +77,7 @@ class CategoryControllerWriteIntegrationTest {
     // given
     String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
 
-    PostCategory postCategory = new PostCategory("카테고리");
+    PostCategory postCategory = new PostCategory("식비");
     String content = objectMapper.writeValueAsString(postCategory);
 
     // when

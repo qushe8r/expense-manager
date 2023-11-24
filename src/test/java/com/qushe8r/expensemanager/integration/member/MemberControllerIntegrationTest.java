@@ -29,7 +29,7 @@ class MemberControllerIntegrationTest {
 
   private static final String EMAIL_EXISTS = "test@email.com";
 
-  private static final String EMAIL_EXAMPLE = "test2@email.com";
+  private static final String EMAIL_EXAMPLE = "test3@email.com";
 
   private static final String PASSWORD_EXAMPLE = "c2f9x9@43a";
 
