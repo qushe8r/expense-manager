@@ -1,5 +1,7 @@
 package com.qushe8r.expensemanager.notification.event.listener;
 
+import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.NotificationUrl;
 import com.qushe8r.expensemanager.notification.recommendation.dto.DailyExpenseRecommendationEvent;
 import com.qushe8r.expensemanager.notification.recommendation.dto.DailyExpenseRecommendationInformation;
 import com.qushe8r.expensemanager.notification.recommendation.event.listener.DiscordNotificationListener;
@@ -46,6 +48,9 @@ class DiscordNotificationListenerTest {
     System.out.println("CurrentThread: " + Thread.currentThread().getName());
     String url = "/";
 
+    NotificationUrl notificationUrl = new NotificationUrl(1L, url, null);
+    Member member = new Member(1L, "test@email.com", "", true, true, notificationUrl);
+
     String category1 = "category1";
     String category2 = "category2";
     Long budgetAmount1 = 1000000L;
@@ -61,10 +66,9 @@ class DiscordNotificationListenerTest {
     List<DailyExpenseRecommendationInformation> informations = List.of(information1, information2);
 
     DailyExpenseRecommendationEvent dailyExpenseRecommendationEvent =
-        new DailyExpenseRecommendationEvent(informations);
+        new DailyExpenseRecommendationEvent(member, informations);
 
     discordNotificationListener.setBaseUrl(baseUrl);
-    discordNotificationListener.setUri(url);
 
     // when
     discordNotificationListener.handle(dailyExpenseRecommendationEvent);

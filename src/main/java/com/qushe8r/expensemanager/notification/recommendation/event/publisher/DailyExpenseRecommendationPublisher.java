@@ -34,12 +34,13 @@ public class DailyExpenseRecommendationPublisher {
 
     // @ManyToOne 자동으로 추가 조회 실행되는 것 최적화 해야함
     // NoticifationUrl을 만들고 나면 Member와 함께 조회해서 할 수 있도록 해야함
-    List<Member> members = memberRepository.findAll();
+    List<Member> members = memberRepository.findAllConsentMemberWithNotificationUrls();
     members.forEach(
         member -> {
           List<DailyExpenseRecommendationInformation> informations =
               repository.query(member.getId(), start, end, month);
-          applicationEventPublisher.publishEvent(new DailyExpenseRecommendationEvent(informations));
+          applicationEventPublisher.publishEvent(
+              new DailyExpenseRecommendationEvent(member, informations));
         });
   }
 }
