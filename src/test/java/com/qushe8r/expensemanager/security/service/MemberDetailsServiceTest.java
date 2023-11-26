@@ -25,7 +25,7 @@ class MemberDetailsServiceTest {
   void loadUserByUsername() {
     // given
     String email = "test@email.com";
-    Member member = new Member(1L, email, "encodedPassword");
+    Member member = new Member(1L, email, "encodedPassword", false, false);
     BDDMockito.given(memberRepository.findByEmail(member.getEmail()))
         .willReturn(Optional.of(member));
 
@@ -44,7 +44,7 @@ class MemberDetailsServiceTest {
   void loadUserByUsernameUsernameNotFoundException() {
     // given
     String email = "test@email.com";
-    Member member = new Member(1L, email, "encodedPassword");
+    Member member = new Member(1L, email, "encodedPassword", false, false);
     BDDMockito.given(memberRepository.findByEmail(member.getEmail())).willReturn(Optional.empty());
 
     // when & then

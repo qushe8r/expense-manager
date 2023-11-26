@@ -56,7 +56,7 @@ class MemberControllerTest {
   void createMember() throws Exception {
     // given
     Long createdMemberId = 1L;
-    PostMember postMember = new PostMember(EMAIL_EXAMPLE, PASSWORD_EXAMPLE);
+    PostMember postMember = new PostMember(EMAIL_EXAMPLE, PASSWORD_EXAMPLE, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     BDDMockito.given(memberService.createMember(Mockito.argThat(new PostMemberMatcher(postMember))))
@@ -86,7 +86,10 @@ class MemberControllerTest {
                     HeaderDocumentation.headerWithName(HttpHeaders.LOCATION).description("리소스 위치")),
                 PayloadDocumentation.requestFields(
                     PayloadDocumentation.fieldWithPath("email").description("회원 이메일"),
-                    PayloadDocumentation.fieldWithPath("password").description("회원 비밀번호"))));
+                    PayloadDocumentation.fieldWithPath("password").description("회원 비밀번호"),
+                    PayloadDocumentation.fieldWithPath("evaluationAlarm").description("회원 비밀번호"),
+                    PayloadDocumentation.fieldWithPath("recommendationAlarm")
+                        .description("회원 비밀번호"))));
   }
 
   @DisplayName("createMemberValidationEmail(): email 유효성 검사 실패")
@@ -94,7 +97,7 @@ class MemberControllerTest {
   @CsvSource({", null은 허용하지 않습니다.", "notEmailPattern, Email 형식이 아닙니다."})
   void createMemberValidationEmail(String email, String reason) throws Exception {
     // given
-    PostMember postMember = new PostMember(email, PASSWORD_EXAMPLE);
+    PostMember postMember = new PostMember(email, PASSWORD_EXAMPLE, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when
@@ -127,7 +130,7 @@ class MemberControllerTest {
   })
   void createMemberValidationPassword(String password, String reason) throws Exception {
     // given
-    PostMember postMember = new PostMember(EMAIL_EXAMPLE, password);
+    PostMember postMember = new PostMember(EMAIL_EXAMPLE, password, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when

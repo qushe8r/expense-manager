@@ -14,7 +14,7 @@ class MemberTest {
     String password = "password";
 
     // when
-    Member member = new Member(memberId, email, password);
+    Member member = new Member(memberId, email, password, false, false);
 
     // then
     Assertions.assertThat(member)
@@ -30,7 +30,7 @@ class MemberTest {
     String password = "password";
 
     // when
-    Member member = new Member(email, password);
+    Member member = new Member(email, password, false, false);
 
     // then
     Assertions.assertThat(member)
@@ -47,7 +47,7 @@ class MemberTest {
     String password = "password";
 
     // when
-    Member member = new Member(memberId, email, password);
+    Member member = new Member(memberId, email, password, false, false);
 
     // then
     Assertions.assertThat(member.getId()).isEqualTo(memberId);

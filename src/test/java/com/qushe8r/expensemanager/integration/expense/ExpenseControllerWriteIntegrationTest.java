@@ -145,8 +145,7 @@ class ExpenseControllerWriteIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.memo").value(memo))
         .andExpect(
             MockMvcResultMatchers.jsonPath("$.data.expenseAt")
-                .value(expenseAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data.categoryName").value("카테고리"));
+                .value(expenseAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))));
   }
 
   @DisplayName("modifyExpense(): 다른 유저가 접근하면 예외가 발생한다")

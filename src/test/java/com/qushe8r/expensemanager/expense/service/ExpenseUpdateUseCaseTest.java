@@ -48,7 +48,7 @@ class ExpenseUpdateUseCaseTest {
 
     PatchExpense patchExpense = new PatchExpense(amount, memo, expenseAt, categoryId);
     Category category = new Category(patchExpense.categoryId(), categoryName);
-    Member member = new Member(1L, "test@email.com", "");
+    Member member = new Member(1L, "test@email.com", "", false, false);
     MemberCategory membercategory = new MemberCategory(memberId, member, category);
 
     BDDMockito.given(categoryService.validateCategoryByIdOrElseThrow(categoryId))

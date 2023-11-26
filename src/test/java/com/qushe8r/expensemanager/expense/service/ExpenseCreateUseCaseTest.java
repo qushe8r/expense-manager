@@ -44,7 +44,7 @@ class ExpenseCreateUseCaseTest {
 
     PostExpense postExpense = new PostExpense(expenseAmount, memo, expenseAt, categoryId);
     Category category = new Category(postExpense.categoryId(), categoryName);
-    Member member = new Member(1L, "test@email.com", "");
+    Member member = new Member(1L, "test@email.com", "", false, false);
     MemberCategory membercategory = new MemberCategory(1L, member, category);
 
     BDDMockito.given(categoryService.validateCategoryByIdOrElseThrow(postExpense.categoryId()))

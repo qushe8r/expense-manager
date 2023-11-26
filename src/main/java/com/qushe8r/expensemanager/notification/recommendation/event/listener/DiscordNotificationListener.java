@@ -24,10 +24,6 @@ public class DiscordNotificationListener implements TodayExpenseRecommendationEv
   @Setter
   private String baseUrl;
 
-  @Setter
-  private String uri =
-      "/1174525103816572968/oU2V6KBENN25GyX5u5uv6Pwhrxik1LxoxVdw6dWHnV-Tm4cq3aLsaoehNs6yMg-ci_Bg";
-
   private final DiscordMapper discordMapper;
 
   @Override
@@ -37,7 +33,7 @@ public class DiscordNotificationListener implements TodayExpenseRecommendationEv
 
     WebClient.create(baseUrl)
         .post()
-        .uri(uri)
+        .uri(event.member().getNotificationUrl().getDiscordUrl())
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(discordBody)
         .retrieve()

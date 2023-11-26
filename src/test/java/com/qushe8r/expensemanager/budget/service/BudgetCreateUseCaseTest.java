@@ -40,7 +40,7 @@ class BudgetCreateUseCaseTest {
     YearMonth month = YearMonth.of(2023, 11);
     PostBudget postBudget = new PostBudget(budgetAmount, month, categoryId);
     Category category = new Category(postBudget.categoryId(), categoryName);
-    Member member = new Member(1L, "test@email.com", "");
+    Member member = new Member(1L, "test@email.com", "", false, false);
     MemberCategory membercategory = new MemberCategory(1L, member, category);
 
     BDDMockito.given(categoryService.validateCategoryByIdOrElseThrow(postBudget.categoryId()))

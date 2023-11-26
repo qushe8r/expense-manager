@@ -57,7 +57,8 @@ class DailyExpenseRecommendationPublisherTest {
 
     List<DailyExpenseRecommendationInformation> informations = List.of(information1, information2);
 
-    BDDMockito.given(memberRepository.findAll()).willReturn(List.of(member));
+    BDDMockito.given(memberRepository.findAllConsentMemberWithNotificationUrls())
+        .willReturn(List.of(member));
     BDDMockito.given(
             repository.query(
                 Mockito.eq(member.getId()),
@@ -73,7 +74,7 @@ class DailyExpenseRecommendationPublisherTest {
     long count = applicationEvents.stream(DailyExpenseRecommendationEvent.class).count();
 
     Assertions.assertThat(count).isEqualTo(1L);
-    Mockito.verify(memberRepository, Mockito.times(1)).findAll();
+    Mockito.verify(memberRepository, Mockito.times(1)).findAllConsentMemberWithNotificationUrls();
     Mockito.verify(repository, Mockito.times(1))
         .query(
             Mockito.eq(member.getId()),
