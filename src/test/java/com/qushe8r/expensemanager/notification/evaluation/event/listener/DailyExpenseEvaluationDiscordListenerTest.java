@@ -52,12 +52,16 @@ class DailyExpenseEvaluationDiscordListenerTest {
 
     String category1 = "category1";
     String category2 = "category2";
+    String category3 = "category3";
     Long budgetAmount1 = 1000000L;
     Long budgetAmount2 = 1000000L;
+    Long budgetAmount3 = 1000000L;
     Long expenseTotals1 = 500000L;
     Long expenseTotals2 = 2000000L;
-    Long todayTotals1 = 30000L;
+    Long expenseTotals3 = 500000L;
+    Long todayTotals1 = 0L;
     Long todayTotals2 = 150000L;
+    Long todayTotals3 = 600000L;
 
     DailyExpenseEvaluationInformation information1 =
         new DailyExpenseEvaluationInformation(
@@ -67,7 +71,12 @@ class DailyExpenseEvaluationDiscordListenerTest {
         new DailyExpenseEvaluationInformation(
             category2, expenseTotals2, todayTotals2, budgetAmount2);
 
-    List<DailyExpenseEvaluationInformation> informations = List.of(information1, information2);
+    DailyExpenseEvaluationInformation information3 =
+        new DailyExpenseEvaluationInformation(
+            category3, expenseTotals3, todayTotals3, budgetAmount3);
+
+    List<DailyExpenseEvaluationInformation> informations =
+        List.of(information1, information2, information3);
 
     DailyExpenseEvaluationEvent dailyExpenseRecommendationEvent =
         new DailyExpenseEvaluationEvent(member, informations);

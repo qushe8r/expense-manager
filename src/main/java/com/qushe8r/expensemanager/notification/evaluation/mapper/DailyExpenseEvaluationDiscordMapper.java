@@ -51,11 +51,11 @@ public class DailyExpenseEvaluationDiscordMapper {
                   Long previousDayTotalExpenses = information.previousDayTotalExpenses();
                   Long todayTotalExpenses = information.todayTotalExpenses();
 
-                  String assessmentPhrase =
-                      assessmentPhrase(previousDayTotalExpenses, todayTotalExpenses);
-
                   Long appropriateDailyExpense =
                       ((budgetAmount - previousDayTotalExpenses) / date / 1000L) * 1000;
+
+                  String assessmentPhrase =
+                      assessmentPhrase(appropriateDailyExpense, todayTotalExpenses);
 
                   StringBuilder sb = new StringBuilder();
                   sb.append(assessmentPhrase)
@@ -73,8 +73,11 @@ public class DailyExpenseEvaluationDiscordMapper {
     return new DiscordBody(username, avatarUrl, content, List.of(discordEmbed));
   }
 
-  private String assessmentPhrase(Long previousDayTotalExpenses, Long todayTotalExpenses) {
-    if (previousDayTotalExpenses >= todayTotalExpenses) {
+  private String assessmentPhrase(Long appropriateDailyExpense, Long todayTotalExpenses) {
+    if (appropriateDailyExpense <= 0) {
+      return "이미 초과 하였습니다.";
+    }
+    if (appropriateDailyExpense >= todayTotalExpenses) {
       return "잘하고 있습니다.";
     }
     return "지출이 계획보다 많습니다.";

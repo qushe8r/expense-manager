@@ -100,7 +100,7 @@ public class DiscordMapper {
     Long expenseTotals = information.expenseTotals();
     String assessmentPhrase = assessmentPhrase(currentMonthProgress, budgetAmount, expenseTotals);
     Long recommendationAmount =
-        budgetAmount - expenseTotals / ((dayOfMonth - date) * 1000L) * 1000L;
+        (budgetAmount - expenseTotals) / ((dayOfMonth - date) * 1000L) * 1000L;
 
     StringBuilder value = new StringBuilder();
     value
