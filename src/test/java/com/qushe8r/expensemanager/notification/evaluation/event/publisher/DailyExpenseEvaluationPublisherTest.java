@@ -3,6 +3,7 @@ package com.qushe8r.expensemanager.notification.evaluation.event.publisher;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.NotificationUrl;
 import com.qushe8r.expensemanager.member.repository.MemberRepository;
 import com.qushe8r.expensemanager.notification.evaluation.dto.DailyExpenseEvaluationEvent;
 import com.qushe8r.expensemanager.notification.evaluation.dto.DailyExpenseEvaluationInformation;
@@ -42,7 +43,8 @@ class DailyExpenseEvaluationPublisherTest {
   @Test
   void dailyExpenseRecommendation() {
     // given
-    Member member = new Member(1L);
+    NotificationUrl notificationUrl = new NotificationUrl(1L, "/url", null);
+    Member member = new Member(1L, "test@email.com", "", true, true, notificationUrl);
 
     String category1 = "category1";
     String category2 = "category2";
@@ -63,7 +65,8 @@ class DailyExpenseEvaluationPublisherTest {
 
     List<DailyExpenseEvaluationInformation> informations = List.of(information1, information2);
 
-    BDDMockito.given(memberRepository.findAll()).willReturn(List.of(member));
+    BDDMockito.given(memberRepository.findAllConsentMemberWithNotificationUrls())
+        .willReturn(List.of(member));
     BDDMockito.given(
             repository.query(
                 Mockito.any(LocalDateTime.class),
@@ -80,7 +83,7 @@ class DailyExpenseEvaluationPublisherTest {
     long count = applicationEvents.stream(DailyExpenseEvaluationEvent.class).count();
 
     Assertions.assertThat(count).isEqualTo(1L);
-    Mockito.verify(memberRepository, Mockito.times(1)).findAll();
+    Mockito.verify(memberRepository, Mockito.times(1)).findAllConsentMemberWithNotificationUrls();
     Mockito.verify(repository, Mockito.times(1))
         .query(
             Mockito.any(LocalDateTime.class),
