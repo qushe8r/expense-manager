@@ -1,11 +1,13 @@
-package com.qushe8r.expensemanager.notification.event.publisher;
+package com.qushe8r.expensemanager.notification.evaluation.event.publisher;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.NotificationUrl;
 import com.qushe8r.expensemanager.member.repository.MemberRepository;
-import com.qushe8r.expensemanager.notification.recommendation.dto.DailyExpenseRecommendationEvent;
-import com.qushe8r.expensemanager.notification.recommendation.dto.DailyExpenseRecommendationInformation;
-import com.qushe8r.expensemanager.notification.recommendation.event.publisher.DailyExpenseRecommendationPublisher;
-import com.qushe8r.expensemanager.notification.recommendation.repository.DailyExpenseRecommendationInformationRepository;
+import com.qushe8r.expensemanager.notification.evaluation.dto.DailyExpenseEvaluationEvent;
+import com.qushe8r.expensemanager.notification.evaluation.dto.DailyExpenseEvaluationInformation;
+import com.qushe8r.expensemanager.notification.evaluation.repository.DailyExpenseEvaluationInformationRepository;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -23,16 +25,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @RecordApplicationEvents
-@Import(DailyExpenseRecommendationPublisher.class)
-class DailyExpenseRecommendationPublisherTest {
+@Import(DailyExpenseEvaluationPublisher.class)
+class DailyExpenseEvaluationPublisherTest {
 
   @MockBean private MemberRepository memberRepository;
 
-  @MockBean private DailyExpenseRecommendationInformationRepository repository;
+  @MockBean private DailyExpenseEvaluationInformationRepository repository;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
-  private DailyExpenseRecommendationPublisher dailyExpenseRecommendationPublisher;
+  private DailyExpenseEvaluationPublisher dailyExpenseRecommendationPublisher;
 
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
@@ -41,7 +43,8 @@ class DailyExpenseRecommendationPublisherTest {
   @Test
   void dailyExpenseRecommendation() {
     // given
-    Member member = new Member(1L);
+    NotificationUrl notificationUrl = new NotificationUrl(1L, "/url", null);
+    Member member = new Member(1L, "test@email.com", "", true, true, notificationUrl);
 
     String category1 = "category1";
     String category2 = "category2";
@@ -49,37 +52,44 @@ class DailyExpenseRecommendationPublisherTest {
     Long budgetAmount2 = 1000000L;
     Long expenseTotals1 = 500000L;
     Long expenseTotals2 = 2000000L;
+    Long todayTotals1 = 30000L;
+    Long todayTotals2 = 150000L;
 
-    DailyExpenseRecommendationInformation information1 =
-        new DailyExpenseRecommendationInformation(category1, budgetAmount1, expenseTotals1);
-    DailyExpenseRecommendationInformation information2 =
-        new DailyExpenseRecommendationInformation(category2, budgetAmount2, expenseTotals2);
+    DailyExpenseEvaluationInformation information1 =
+        new DailyExpenseEvaluationInformation(
+            category1, expenseTotals1, todayTotals1, budgetAmount1);
 
-    List<DailyExpenseRecommendationInformation> informations = List.of(information1, information2);
+    DailyExpenseEvaluationInformation information2 =
+        new DailyExpenseEvaluationInformation(
+            category2, expenseTotals2, todayTotals2, budgetAmount2);
+
+    List<DailyExpenseEvaluationInformation> informations = List.of(information1, information2);
 
     BDDMockito.given(memberRepository.findAllConsentMemberWithNotificationUrls())
         .willReturn(List.of(member));
     BDDMockito.given(
             repository.query(
-                Mockito.eq(member.getId()),
                 Mockito.any(LocalDateTime.class),
                 Mockito.any(LocalDateTime.class),
-                Mockito.any(YearMonth.class)))
+                Mockito.any(LocalDateTime.class),
+                Mockito.any(YearMonth.class),
+                Mockito.eq(member.getId())))
         .willReturn(informations);
 
     // when
     dailyExpenseRecommendationPublisher.dailyExpenseRecommendation();
 
     // then
-    long count = applicationEvents.stream(DailyExpenseRecommendationEvent.class).count();
+    long count = applicationEvents.stream(DailyExpenseEvaluationEvent.class).count();
 
     Assertions.assertThat(count).isEqualTo(1L);
     Mockito.verify(memberRepository, Mockito.times(1)).findAllConsentMemberWithNotificationUrls();
     Mockito.verify(repository, Mockito.times(1))
         .query(
-            Mockito.eq(member.getId()),
             Mockito.any(LocalDateTime.class),
             Mockito.any(LocalDateTime.class),
-            Mockito.any(YearMonth.class));
+            Mockito.any(LocalDateTime.class),
+            Mockito.any(YearMonth.class),
+            Mockito.eq(member.getId()));
   }
 }

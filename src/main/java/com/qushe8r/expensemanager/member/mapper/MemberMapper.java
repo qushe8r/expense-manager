@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class MemberMapper {
 
   public Member toEntity(PostMember dto, String encodedPassword) {
-    return new Member(dto.email(), encodedPassword);
+    return new Member(
+        dto.email(), encodedPassword, dto.evaluationAlarm(), dto.recommendationAlarm());
   }
 }

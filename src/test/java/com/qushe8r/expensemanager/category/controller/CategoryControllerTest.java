@@ -24,11 +24,19 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.headers.HeaderDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -39,6 +47,7 @@ import org.springframework.util.MultiValueMap;
 
 @WebMvcTest(CategoryController.class)
 @Import(TestSecurityConfig.class)
+@AutoConfigureRestDocs
 class CategoryControllerTest {
 
   private static final String CATEGORY_NAME = "카테고리";
@@ -80,7 +89,17 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(
             MockMvcResultMatchers.header()
-                .string(HttpHeaders.LOCATION, CATEGORY_DEFAULT_URL + "/" + createdCategoryId));
+                .string(HttpHeaders.LOCATION, CATEGORY_DEFAULT_URL + "/" + createdCategoryId))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-categories",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("name").description("카테고리 이름")),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION)
+                        .description("리소스 위치"))));
   }
 
   @DisplayName("createCategoryValidationCategoryName(): category 이름 유효성 검사 실패")
@@ -130,8 +149,22 @@ class CategoryControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].id").isNumber())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].name").isString())
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME));
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data[?(@.id == 1)].name").value(CATEGORY_NAME))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "get-categories",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.ARRAY)
+                        .description("데이터 목록"),
+                    PayloadDocumentation.fieldWithPath("data[].id")
+                        .type(JsonFieldType.NUMBER)
+                        .description("카테고리 식별자"),
+                    PayloadDocumentation.fieldWithPath("data[].name")
+                        .type(JsonFieldType.STRING)
+                        .description("카테고리 이름"))));
   }
 
   @DisplayName("getCategorizedExpense(): 조회 성공시 GlobalTotalsExpenseResponse(dto)를 반환한다.")
@@ -169,7 +202,7 @@ class CategoryControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
+            RestDocumentationRequestBuilders.get(CATEGORY_DEFAULT_URL + "/expenses")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .params(params));
@@ -191,8 +224,55 @@ class CategoryControllerTest {
         .andExpect(
             MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].memo").isString())
         .andExpect(
-            MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].expenseAt")
-                .isString());
+            MockMvcResultMatchers.jsonPath("$.data.categories[0].expenses[0].expenseAt").isString())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "get-categorized-expenses",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                RequestDocumentation.queryParameters(
+                    RequestDocumentation.parameterWithName("start").description("조회 시작 일자"),
+                    RequestDocumentation.parameterWithName("end").description("조회 종료 일자"),
+                    RequestDocumentation.parameterWithName("min")
+                        .description("조회 최소 금액")
+                        .optional(),
+                    RequestDocumentation.parameterWithName("max")
+                        .description("조회 최대 금액")
+                        .optional(),
+                    RequestDocumentation.parameterWithName("categoryId")
+                        .description("카테고리 식별자")
+                        .optional()),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.OBJECT)
+                        .description("데이터"),
+                    PayloadDocumentation.fieldWithPath("data.globalTotals")
+                        .type(JsonFieldType.NUMBER)
+                        .description("모든 카테고리 총합"),
+                    PayloadDocumentation.fieldWithPath("data.categories")
+                        .type(JsonFieldType.ARRAY)
+                        .description("카테고리 목록"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].categoryName")
+                        .type(JsonFieldType.STRING)
+                        .description("카테고리 이름"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].categoryTotals")
+                        .type(JsonFieldType.NUMBER)
+                        .description("카테고리 총합"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses")
+                        .type(JsonFieldType.ARRAY)
+                        .description("카테고리 별 지출 목록"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].expenseId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지출 식별자"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].amount")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지출 금액"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].memo")
+                        .type(JsonFieldType.STRING)
+                        .description("지출 메모"),
+                    PayloadDocumentation.fieldWithPath("data.categories[].expenses[].expenseAt")
+                        .type(JsonFieldType.STRING)
+                        .description("지출 시기"))));
   }
 
   @DisplayName("getCategorizedExpenseMinNotPositive(): min이 양의 정수가 아니면 에러가 발생한다.")

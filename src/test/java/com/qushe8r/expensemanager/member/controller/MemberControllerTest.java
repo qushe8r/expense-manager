@@ -1,9 +1,14 @@
 package com.qushe8r.expensemanager.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
+import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
+import com.qushe8r.expensemanager.config.TestSecurityConfig;
+import com.qushe8r.expensemanager.matcher.MemberDetailsMatcher;
+import com.qushe8r.expensemanager.matcher.PatchPasswordMatcher;
 import com.qushe8r.expensemanager.matcher.PostMemberMatcher;
+import com.qushe8r.expensemanager.member.dto.PatchPassword;
 import com.qushe8r.expensemanager.member.dto.PostMember;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,16 +17,26 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.headers.HeaderDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTestWithoutSecurityConfig(MemberController.class)
+@WebMvcTest(MemberController.class)
+@Import(TestSecurityConfig.class)
+@AutoConfigureRestDocs
 class MemberControllerTest {
 
   private static final String EMAIL_EXAMPLE = "test@email.com";
@@ -41,7 +56,7 @@ class MemberControllerTest {
   void createMember() throws Exception {
     // given
     Long createdMemberId = 1L;
-    PostMember postMember = new PostMember(EMAIL_EXAMPLE, PASSWORD_EXAMPLE);
+    PostMember postMember = new PostMember(EMAIL_EXAMPLE, PASSWORD_EXAMPLE, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     BDDMockito.given(memberService.createMember(Mockito.argThat(new PostMemberMatcher(postMember))))
@@ -50,7 +65,7 @@ class MemberControllerTest {
     // when
     ResultActions actions =
         mockMvc.perform(
-            MockMvcRequestBuilders.post(MEMBER_DEFAULT_URL)
+            RestDocumentationRequestBuilders.post(MEMBER_DEFAULT_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(content));
@@ -61,7 +76,20 @@ class MemberControllerTest {
         .andExpect(MockMvcResultMatchers.status().isCreated())
         .andExpect(
             MockMvcResultMatchers.header()
-                .string(HttpHeaders.LOCATION, "/members/" + createdMemberId));
+                .string(HttpHeaders.LOCATION, "/members/" + createdMemberId))
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-members",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.LOCATION).description("리소스 위치")),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("email").description("회원 이메일"),
+                    PayloadDocumentation.fieldWithPath("password").description("회원 비밀번호"),
+                    PayloadDocumentation.fieldWithPath("evaluationAlarm").description("회원 비밀번호"),
+                    PayloadDocumentation.fieldWithPath("recommendationAlarm")
+                        .description("회원 비밀번호"))));
   }
 
   @DisplayName("createMemberValidationEmail(): email 유효성 검사 실패")
@@ -69,7 +97,7 @@ class MemberControllerTest {
   @CsvSource({", null은 허용하지 않습니다.", "notEmailPattern, Email 형식이 아닙니다."})
   void createMemberValidationEmail(String email, String reason) throws Exception {
     // given
-    PostMember postMember = new PostMember(email, PASSWORD_EXAMPLE);
+    PostMember postMember = new PostMember(email, PASSWORD_EXAMPLE, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when
@@ -102,7 +130,7 @@ class MemberControllerTest {
   })
   void createMemberValidationPassword(String password, String reason) throws Exception {
     // given
-    PostMember postMember = new PostMember(EMAIL_EXAMPLE, password);
+    PostMember postMember = new PostMember(EMAIL_EXAMPLE, password, false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when
@@ -122,5 +150,40 @@ class MemberControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors").isNotEmpty())
         .andExpect(MockMvcResultMatchers.jsonPath("$.fieldErrors[0].field").value("password"))
         .andExpect(MockMvcResultMatchers.jsonPath("$.violationErrors").isEmpty());
+  }
+
+  @WithMemberPrincipals
+  @Test
+  void modifyPassword() throws Exception {
+    // given
+    PatchPassword patchPassword = new PatchPassword("newPassword");
+    String content = objectMapper.writeValueAsString(patchPassword);
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
+    BDDMockito.doNothing()
+        .when(memberService)
+        .modifyPassword(
+            Mockito.argThat(new MemberDetailsMatcher(memberDetails)),
+            Mockito.argThat(new PatchPasswordMatcher(patchPassword)));
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.patch(MEMBER_DEFAULT_URL + "/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(content));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "patch-members-password",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("password").description("변경할 비밀번호"))));
   }
 }

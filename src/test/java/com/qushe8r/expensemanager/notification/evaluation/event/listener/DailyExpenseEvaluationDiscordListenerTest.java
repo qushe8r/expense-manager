@@ -1,11 +1,10 @@
-package com.qushe8r.expensemanager.notification.event.listener;
+package com.qushe8r.expensemanager.notification.evaluation.event.listener;
 
 import com.qushe8r.expensemanager.member.entity.Member;
 import com.qushe8r.expensemanager.member.entity.NotificationUrl;
-import com.qushe8r.expensemanager.notification.recommendation.dto.DailyExpenseRecommendationEvent;
-import com.qushe8r.expensemanager.notification.recommendation.dto.DailyExpenseRecommendationInformation;
-import com.qushe8r.expensemanager.notification.recommendation.event.listener.DiscordNotificationListener;
-import com.qushe8r.expensemanager.notification.recommendation.mapper.DiscordMapper;
+import com.qushe8r.expensemanager.notification.evaluation.dto.DailyExpenseEvaluationEvent;
+import com.qushe8r.expensemanager.notification.evaluation.dto.DailyExpenseEvaluationInformation;
+import com.qushe8r.expensemanager.notification.evaluation.mapper.DailyExpenseEvaluationDiscordMapper;
 import java.io.IOException;
 import java.util.List;
 import okhttp3.mockwebserver.MockWebServer;
@@ -20,13 +19,13 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DiscordNotificationListenerTest {
+class DailyExpenseEvaluationDiscordListenerTest {
 
   private static MockWebServer mockWebServer;
 
-  @Spy private DiscordMapper discordMapper;
+  @Spy private DailyExpenseEvaluationDiscordMapper discordMapper;
 
-  @InjectMocks private DiscordNotificationListener discordNotificationListener;
+  @InjectMocks private DailyExpenseEvaluationDiscordListener discordNotificationListener;
 
   private static String baseUrl;
 
@@ -57,16 +56,21 @@ class DiscordNotificationListenerTest {
     Long budgetAmount2 = 1000000L;
     Long expenseTotals1 = 500000L;
     Long expenseTotals2 = 2000000L;
+    Long todayTotals1 = 30000L;
+    Long todayTotals2 = 150000L;
 
-    DailyExpenseRecommendationInformation information1 =
-        new DailyExpenseRecommendationInformation(category1, budgetAmount1, expenseTotals1);
-    DailyExpenseRecommendationInformation information2 =
-        new DailyExpenseRecommendationInformation(category2, budgetAmount2, expenseTotals2);
+    DailyExpenseEvaluationInformation information1 =
+        new DailyExpenseEvaluationInformation(
+            category1, expenseTotals1, todayTotals1, budgetAmount1);
 
-    List<DailyExpenseRecommendationInformation> informations = List.of(information1, information2);
+    DailyExpenseEvaluationInformation information2 =
+        new DailyExpenseEvaluationInformation(
+            category2, expenseTotals2, todayTotals2, budgetAmount2);
 
-    DailyExpenseRecommendationEvent dailyExpenseRecommendationEvent =
-        new DailyExpenseRecommendationEvent(member, informations);
+    List<DailyExpenseEvaluationInformation> informations = List.of(information1, information2);
+
+    DailyExpenseEvaluationEvent dailyExpenseRecommendationEvent =
+        new DailyExpenseEvaluationEvent(member, informations);
 
     discordNotificationListener.setBaseUrl(baseUrl);
 

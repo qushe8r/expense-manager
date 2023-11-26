@@ -1,8 +1,10 @@
 package com.qushe8r.expensemanager.member.service;
 
 import com.qushe8r.expensemanager.matcher.MemberMatcher;
+import com.qushe8r.expensemanager.member.dto.PatchPassword;
 import com.qushe8r.expensemanager.member.dto.PostMember;
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.member.exception.MemberAlreadyExistException;
 import com.qushe8r.expensemanager.member.exception.MemberNotFoundException;
 import com.qushe8r.expensemanager.member.mapper.MemberMapper;
@@ -40,7 +42,7 @@ class MemberServiceTest {
     String password = "password";
     String encodedPassword = "encodedPassword";
 
-    PostMember postMember = new PostMember(email, password);
+    PostMember postMember = new PostMember(email, password, false, false);
 
     BDDMockito.given(passwordEncoder.encode(password)).willReturn(encodedPassword);
 
@@ -48,8 +50,9 @@ class MemberServiceTest {
 
     BDDMockito.given(
             memberRepository.save(
-                Mockito.argThat(new MemberMatcher(new Member(email, encodedPassword)))))
-        .willReturn(new Member(expectedId, email, encodedPassword));
+                Mockito.argThat(
+                    new MemberMatcher(new Member(email, encodedPassword, false, false)))))
+        .willReturn(new Member(expectedId, email, encodedPassword, false, false));
 
     // when
     Long memberId = memberService.createMember(postMember);
@@ -59,7 +62,7 @@ class MemberServiceTest {
     Mockito.verify(passwordEncoder, Mockito.times(1)).encode(password);
     Mockito.verify(memberRepository, Mockito.times(1)).findByEmail(email);
     Mockito.verify(memberRepository, Mockito.times(1))
-        .save(Mockito.argThat(new MemberMatcher(new Member(email, encodedPassword))));
+        .save(Mockito.argThat(new MemberMatcher(new Member(email, encodedPassword, false, false))));
   }
 
   @DisplayName(
@@ -71,10 +74,10 @@ class MemberServiceTest {
     String password = "password";
     String encodedPassword = "encodedPassword";
 
-    PostMember postMember = new PostMember(email, password);
+    PostMember postMember = new PostMember(email, password, false, false);
 
     BDDMockito.given(memberRepository.findByEmail(email))
-        .willReturn(Optional.of(new Member(1L, email, encodedPassword)));
+        .willReturn(Optional.of(new Member(1L, email, encodedPassword, false, false)));
 
     // when & then
     Assertions.assertThatThrownBy(() -> memberService.createMember(postMember))
@@ -90,7 +93,7 @@ class MemberServiceTest {
     String email = "test@email.com";
     String password = "password";
 
-    Member member = new Member(memberId, email, password);
+    Member member = new Member(memberId, email, password, false, false);
 
     BDDMockito.given(memberRepository.findByEmail(email)).willReturn(Optional.of(member));
 
@@ -115,6 +118,43 @@ class MemberServiceTest {
 
     // when & then
     Assertions.assertThatThrownBy(() -> memberService.validateMemberExistByEmailOrElseThrow(email))
+        .isInstanceOf(MemberNotFoundException.class);
+  }
+
+  @DisplayName("modifyPassword(): 정상적으로 비밀번호가 변경되면 아무런 응답도 없다.")
+  @Test
+  void modifyPassword() {
+    // given
+    Long memberId = 1L;
+    String newPassword = "newPassword";
+    String encodedNewPassword = "encodedNewPassword";
+    MemberDetails memberDetails = new MemberDetails(memberId, "test@email.com", "");
+    PatchPassword dto = new PatchPassword(newPassword);
+    Member member = new Member(memberId, "test@email.com", "oldPassword", false, false);
+
+    BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+    BDDMockito.given(passwordEncoder.encode(newPassword)).willReturn(encodedNewPassword);
+
+    // when
+    memberService.modifyPassword(memberDetails, dto);
+
+    // then
+    Assertions.assertThat(member.getPassword()).isEqualTo(encodedNewPassword);
+  }
+
+  @DisplayName("modifyPasswordMemberNotFoundException(): 회원 조회에 실패하면 에외가 발생한다")
+  @Test
+  void modifyPasswordMemberNotFoundException() {
+    // given
+    Long memberId = 1L;
+    String newPassword = "newPassword";
+    MemberDetails memberDetails = new MemberDetails(memberId, "test@email.com", "");
+    PatchPassword dto = new PatchPassword(newPassword);
+
+    BDDMockito.given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+    // when & then
+    Assertions.assertThatThrownBy(() -> memberService.modifyPassword(memberDetails, dto))
         .isInstanceOf(MemberNotFoundException.class);
   }
 }

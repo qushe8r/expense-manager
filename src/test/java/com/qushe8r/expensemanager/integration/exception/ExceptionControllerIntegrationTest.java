@@ -42,7 +42,7 @@ class ExceptionControllerIntegrationTest {
   @Test
   void methodArgumentNotValidException() throws Exception {
     // given
-    PostMember postMember = new PostMember("notEmailPattern", "171717171717");
+    PostMember postMember = new PostMember("notEmailPattern", "171717171717", false, false);
     String content = objectMapper.writeValueAsString(postMember);
 
     // when

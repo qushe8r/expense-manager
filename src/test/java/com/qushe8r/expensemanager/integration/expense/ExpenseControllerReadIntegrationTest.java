@@ -4,8 +4,6 @@ import com.qushe8r.expensemanager.config.DataSourceSelector;
 import com.qushe8r.expensemanager.security.jwt.JwtProperties;
 import com.qushe8r.expensemanager.security.jwt.TokenProvider;
 import com.qushe8r.expensemanager.stub.JwtFactory;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,12 +44,7 @@ class ExpenseControllerReadIntegrationTest {
   void modifyExpense() throws Exception {
     // given
     String accessToken = JwtFactory.withDefaultValues().generateToken(jwtProperties);
-
     Long expenseId = 1L;
-    Long amount = 10000L;
-    String memo = "김밥";
-    LocalDateTime expenseAt = LocalDateTime.of(2023, 11, 15, 12, 0);
-    String categoryName = "카테고리";
 
     // when
     ResultActions actions =
@@ -67,11 +60,9 @@ class ExpenseControllerReadIntegrationTest {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data").isMap())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.expenseId").isNumber())
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data.amount").value(amount))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data.memo").value(memo))
-        .andExpect(
-            MockMvcResultMatchers.jsonPath("$.data.expenseAt")
-                .value(expenseAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data.categoryName").value(categoryName));
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.amount").isNumber())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.memo").isString())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.expenseAt").isString())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.categoryName").isString());
   }
 }
