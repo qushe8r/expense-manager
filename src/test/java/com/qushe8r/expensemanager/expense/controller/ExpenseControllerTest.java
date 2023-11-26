@@ -3,7 +3,10 @@ package com.qushe8r.expensemanager.expense.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
 import com.qushe8r.expensemanager.config.TestSecurityConfig;
+import com.qushe8r.expensemanager.expense.dto.ExpenseMonthlyReportResponse;
+import com.qushe8r.expensemanager.expense.dto.ExpenseReportResponse;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
+import com.qushe8r.expensemanager.expense.dto.ExpenseWeeklyReport;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.service.ExpenseCreateUseCase;
@@ -14,6 +17,7 @@ import com.qushe8r.expensemanager.matcher.PatchExpenseMatcher;
 import com.qushe8r.expensemanager.matcher.PostExpenseMatcher;
 import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -359,5 +363,67 @@ class ExpenseControllerTest {
                 .value("deleteExpense.expenseId"));
     Mockito.verify(expenseService, Mockito.times(0))
         .deleteExpense(Mockito.anyLong(), Mockito.anyLong());
+  }
+
+  @WithMemberPrincipals
+  @Test
+  void getReport() throws Exception {
+    // given
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+
+    ExpenseMonthlyReportResponse monthlyReportResponse =
+        new ExpenseMonthlyReportResponse(1L, "categoryName", 100000L, 35000L, 100000L, 25000L);
+    List<ExpenseMonthlyReportResponse> monthlyReports = List.of(monthlyReportResponse);
+
+    ExpenseWeeklyReport expenseWeeklyReport =
+        new ExpenseWeeklyReport(1L, "categoryName", 25000L, 10000L);
+    List<ExpenseWeeklyReport> weeklyReports = List.of(expenseWeeklyReport);
+
+    ExpenseReportResponse expenseReportResponse =
+        new ExpenseReportResponse(monthlyReports, weeklyReports);
+
+    BDDMockito.given(
+            expenseService.getReport(Mockito.argThat(new MemberDetailsMatcher(memberDetails))))
+        .willReturn(expenseReportResponse);
+
+    // when
+    ResultActions actions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get(EXPENSE_DEFAULT_URL + "/report")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+    // then
+    actions
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data").isMap())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.monthlyReports").isArray())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.monthlyReports[0].categoryId").isNumber())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.monthlyReports[0].categoryName").isString())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.monthlyReports[0].lastMonthBudget").isNumber())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.monthlyReports[0].lastMonthExpenseTotals")
+                .isNumber())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.monthlyReports[0].thisMonthBudget").isNumber())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.monthlyReports[0].thisMonthExpenseTotals")
+                .isNumber())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.weeklyReports").isArray())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.weeklyReports[0].categoryId").isNumber())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.weeklyReports[0].categoryName").isString())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.weeklyReports[0].twoWeeksAgoExpenseAmount")
+                .isNumber())
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.data.weeklyReports[0].oneWeekAgoExpenseAmount")
+                .isNumber());
+
+    Mockito.verify(expenseService, Mockito.times(1))
+        .getReport(Mockito.argThat(new MemberDetailsMatcher(memberDetails)));
   }
 }

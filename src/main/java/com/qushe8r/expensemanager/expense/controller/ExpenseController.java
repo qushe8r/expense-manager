@@ -2,6 +2,7 @@ package com.qushe8r.expensemanager.expense.controller;
 
 import com.qushe8r.expensemanager.common.dto.SingleResponse;
 import com.qushe8r.expensemanager.common.utils.UriCreator;
+import com.qushe8r.expensemanager.expense.dto.ExpenseReportResponse;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
@@ -70,5 +71,12 @@ public class ExpenseController {
       @PathVariable @Positive Long expenseId) {
     expenseService.deleteExpense(memberDetails.getId(), expenseId);
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/report")
+  public ResponseEntity<SingleResponse<ExpenseReportResponse>> getReport(
+      @AuthenticationPrincipal MemberDetails memberDetails) {
+    ExpenseReportResponse response = expenseService.getReport(memberDetails);
+    return ResponseEntity.ok(new SingleResponse<>(response));
   }
 }
