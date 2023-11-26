@@ -3,17 +3,24 @@ package com.qushe8r.expensemanager.expense.service;
 import com.qushe8r.expensemanager.annotation.WithMemberPrincipals;
 import com.qushe8r.expensemanager.category.entity.Category;
 import com.qushe8r.expensemanager.category.entity.MemberCategory;
+import com.qushe8r.expensemanager.expense.dto.ExpenseMonthlyReport;
+import com.qushe8r.expensemanager.expense.dto.ExpenseReportResponse;
 import com.qushe8r.expensemanager.expense.dto.ExpenseResponse;
+import com.qushe8r.expensemanager.expense.dto.ExpenseWeeklyReport;
 import com.qushe8r.expensemanager.expense.dto.PatchExpense;
 import com.qushe8r.expensemanager.expense.dto.PostExpense;
 import com.qushe8r.expensemanager.expense.entity.Expense;
 import com.qushe8r.expensemanager.expense.exception.ExpenseNotFoundException;
 import com.qushe8r.expensemanager.expense.mapper.ExpenseMapper;
 import com.qushe8r.expensemanager.expense.repository.ExpenseQueryDslRepository;
+import com.qushe8r.expensemanager.expense.repository.ExpenseReportRepository;
 import com.qushe8r.expensemanager.expense.repository.ExpenseRepository;
 import com.qushe8r.expensemanager.matcher.ExpenseMatcher;
 import com.qushe8r.expensemanager.member.entity.Member;
+import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +41,8 @@ class ExpenseServiceTest {
   @Mock private ExpenseRepository expenseRepository;
 
   @Mock private ExpenseQueryDslRepository expenseQueryDslRepository;
+
+  @Mock private ExpenseReportRepository expenseReportRepository;
 
   @InjectMocks private ExpenseService expenseService;
 
@@ -220,5 +229,56 @@ class ExpenseServiceTest {
     Mockito.verify(expenseRepository, Mockito.times(1))
         .findByMemberIdAndExpenseId(memberId, expenseId);
     Mockito.verify(expenseRepository, Mockito.times(0)).delete(Mockito.any(Expense.class));
+  }
+
+  @Test
+  void getReport() {
+    // given
+    MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
+    YearMonth thisMonth = YearMonth.of(2023, 11);
+    YearMonth lastMonth = YearMonth.of(2023, 10);
+
+    BDDMockito.given(
+            expenseReportRepository.reportMonthlyExpenses(
+                Mockito.eq(memberDetails.getId()),
+                Mockito.any(LocalDateTime.class),
+                Mockito.any(LocalDateTime.class),
+                Mockito.eq(lastMonth)))
+        .willReturn(List.of(new ExpenseMonthlyReport(1L, "categoryName", 100000L, 50000L)));
+
+    BDDMockito.given(
+            expenseReportRepository.reportMonthlyExpenses(
+                Mockito.eq(memberDetails.getId()),
+                Mockito.any(LocalDateTime.class),
+                Mockito.any(LocalDateTime.class),
+                Mockito.eq(thisMonth)))
+        .willReturn(List.of(new ExpenseMonthlyReport(1L, "categoryName", 100000L, 35000L)));
+
+    BDDMockito.given(
+            expenseReportRepository.reportWeeklyExpenses(
+                Mockito.eq(memberDetails.getId()),
+                Mockito.any(LocalDateTime.class),
+                Mockito.any(LocalDateTime.class),
+                Mockito.any(LocalDateTime.class)))
+        .willReturn(List.of(new ExpenseWeeklyReport(1L, "categoryName", 25000L, 10000L)));
+
+    // when
+    ExpenseReportResponse report = expenseService.getReport(memberDetails);
+
+    // then
+    Assertions.assertThat(report.monthlyReports()).hasSize(1);
+    Assertions.assertThat(report.monthlyReports().get(0))
+        .hasFieldOrPropertyWithValue("categoryId", 1L)
+        .hasFieldOrPropertyWithValue("categoryName", "categoryName")
+        .hasFieldOrPropertyWithValue("lastMonthBudget", 100000L)
+        .hasFieldOrPropertyWithValue("lastMonthExpenseTotals", 50000L)
+        .hasFieldOrPropertyWithValue("thisMonthBudget", 100000L)
+        .hasFieldOrPropertyWithValue("thisMonthExpenseTotals", 35000L);
+    Assertions.assertThat(report.weeklyReports()).hasSize(1);
+    Assertions.assertThat(report.weeklyReports().get(0))
+        .hasFieldOrPropertyWithValue("categoryId", 1L)
+        .hasFieldOrPropertyWithValue("categoryName", "categoryName")
+        .hasFieldOrPropertyWithValue("twoWeeksAgoExpenseAmount", 25000L)
+        .hasFieldOrPropertyWithValue("oneWeekAgoExpenseAmount", 10000L);
   }
 }
