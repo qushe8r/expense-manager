@@ -421,7 +421,51 @@ class ExpenseControllerTest {
                 .isNumber())
         .andExpect(
             MockMvcResultMatchers.jsonPath("$.data.weeklyReports[0].oneWeekAgoExpenseAmount")
-                .isNumber());
+                .isNumber())
+            .andDo(MockMvcRestDocumentation.document(
+                "get-expenses-report",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.responseFields(
+                    PayloadDocumentation.fieldWithPath("data")
+                        .type(JsonFieldType.OBJECT)
+                        .description("데이터"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports")
+                        .type(JsonFieldType.ARRAY)
+                        .description("월간 지출 통계"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].categoryId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("카테고리 식별자"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].categoryName")
+                        .type(JsonFieldType.STRING)
+                        .description("카테고리 이름"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].lastMonthBudget")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지난달 예산"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].lastMonthExpenseTotals")
+                        .type(JsonFieldType.NUMBER)
+                        .description("지난달 동일 지출 합계"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].thisMonthBudget")
+                        .type(JsonFieldType.NUMBER)
+                        .description("이번달 카테고리 예산"),
+                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].thisMonthExpenseTotals")
+                        .type(JsonFieldType.NUMBER)
+                        .description("이번달 현재 지출 합계"),
+                    PayloadDocumentation.fieldWithPath("data.weeklyReports")
+                        .type(JsonFieldType.ARRAY)
+                        .description("주간 지출 통계"),
+                    PayloadDocumentation.fieldWithPath("data.weeklyReports[].categoryId")
+                        .type(JsonFieldType.NUMBER)
+                        .description("카테고리 식별자"),
+                    PayloadDocumentation.fieldWithPath("data.weeklyReports[].categoryName")
+                        .type(JsonFieldType.STRING)
+                        .description("카테고리 이름"),
+                    PayloadDocumentation.fieldWithPath("data.weeklyReports[].twoWeeksAgoExpenseAmount")
+                        .type(JsonFieldType.NUMBER)
+                        .description("저번주 1주일간 지출 합계"),
+                    PayloadDocumentation.fieldWithPath("data.weeklyReports[].oneWeekAgoExpenseAmount")
+                        .type(JsonFieldType.NUMBER)
+                        .description("최근 1주일간 지출 합계"))));
 
     Mockito.verify(expenseService, Mockito.times(1))
         .getReport(Mockito.argThat(new MemberDetailsMatcher(memberDetails)));
