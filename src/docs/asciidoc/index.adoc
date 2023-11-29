@@ -152,7 +152,7 @@ include::{snippets}/delete-budgets/http-response.adoc[]
 
 
 == Expense
-=== 예산 등록
+=== 지출 등록
 
 .curl-request
 include::{snippets}/post-expenses/curl-request.adoc[]
@@ -172,7 +172,7 @@ include::{snippets}/post-expenses/http-response.adoc[]
 .response-headers
 include::{snippets}/post-expenses/response-headers.adoc[]
 
-=== 예산
+=== 지출 수정
 
 .curl-request
 include::{snippets}/patch-expenses/curl-request.adoc[]
@@ -211,3 +211,16 @@ include::{snippets}/delete-expenses/path-parameters.adoc[]
 
 .http-response
 include::{snippets}/delete-expenses/http-response.adoc[]
+
+=== 지출 통계
+.curl-request
+include::{snippets}/get-expenses-report/curl-request.adoc[]
+
+.http-request
+include::{snippets}/get-expenses-report/http-request.adoc[]
+
+.http-response
+include::{snippets}/get-expenses-report/http-response.adoc[]
+
+.response-fields
+include::{snippets}/get-expenses-report/response-fields.adoc[]
