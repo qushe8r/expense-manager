@@ -49,6 +49,29 @@ include::{snippets}/patch-members-password/request-fields.adoc[]
 include::{snippets}/patch-members-password/http-response.adoc[]
 
 == Auth
+=== 로그인
+
+.curl-request
+include::{snippets}/post-sign-in/curl-request.adoc[]
+
+.http-reqeust
+include::{snippets}/post-sign-in/http-request.adoc[]
+
+.request-body
+include::{snippets}/post-sign-in/request-body.adoc[]
+
+.request-fields
+include::{snippets}/post-sign-in/request-fields.adoc[]
+
+.http-response
+include::{snippets}/post-sign-in/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-sign-in/response-headers.adoc[]
+
+.response-cookies
+include::{snippets}/post-sign-in/response-cookies.adoc[]
+
 === 토큰 재발급
 
 .curl-request
