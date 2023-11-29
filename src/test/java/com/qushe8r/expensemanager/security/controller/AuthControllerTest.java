@@ -1,7 +1,5 @@
 package com.qushe8r.expensemanager.security.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.qushe8r.expensemanager.annotation.WebMvcTestWithoutSecurityConfig;
 import com.qushe8r.expensemanager.security.service.AuthService;
 import com.qushe8r.expensemanager.security.utils.CookieCreator;
@@ -20,10 +18,8 @@ import org.springframework.restdocs.headers.HeaderDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
-import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -31,11 +27,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureRestDocs
 class AuthControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @MockBean
-  private AuthService authService;
+  @MockBean private AuthService authService;
 
   @Test
   void reissue() throws Exception {
@@ -66,19 +60,17 @@ class AuthControllerTest {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.AUTHORIZATION, newAccessToken))
         .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.SET_COOKIE))
-        .andDo(MockMvcRestDocumentation.document(
-            "post-reissue",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-            CookieDocumentation.requestCookies(
-                CookieDocumentation.cookieWithName("Refresh").description("리프레시 토큰")
-            ),
-            HeaderDocumentation.responseHeaders(
-                HeaderDocumentation.headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰(재발급)")
-            ),
-            CookieDocumentation.responseCookies(
-                CookieDocumentation.cookieWithName("Refresh").description("리프레시 토큰(재발급)")
-            )
-        ));
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-reissue",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                CookieDocumentation.requestCookies(
+                    CookieDocumentation.cookieWithName("Refresh").description("리프레시 토큰")),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.AUTHORIZATION)
+                        .description("액세스 토큰(재발급)")),
+                CookieDocumentation.responseCookies(
+                    CookieDocumentation.cookieWithName("Refresh").description("리프레시 토큰(재발급)"))));
   }
 }
