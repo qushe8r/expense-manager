@@ -20,7 +20,6 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureRestDocs
 class SecurityIntegrationTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private DataSourceSelector dataSourceSelector;
+  @Autowired private DataSourceSelector dataSourceSelector;
 
   @BeforeEach
   void setUp() {
@@ -66,19 +62,19 @@ class SecurityIntegrationTest {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.AUTHORIZATION))
         .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.SET_COOKIE))
-        .andDo(MockMvcRestDocumentation.document(
-            "post-sign-in",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-            PayloadDocumentation.requestFields(
-                PayloadDocumentation.fieldWithPath("email").description("이메일(아이디)"),
-                PayloadDocumentation.fieldWithPath("password").description("변경할 비밀번호")
-            ),
-            HeaderDocumentation.responseHeaders(
-                HeaderDocumentation.headerWithName(HttpHeaders.AUTHORIZATION)
-                    .description("액세스 토큰")),
-            CookieDocumentation.responseCookies(
-                CookieDocumentation.cookieWithName("Refresh").description("리프레시 토큰"))));
+        .andDo(
+            MockMvcRestDocumentation.document(
+                "post-sign-in",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                PayloadDocumentation.requestFields(
+                    PayloadDocumentation.fieldWithPath("email").description("이메일(아이디)"),
+                    PayloadDocumentation.fieldWithPath("password").description("변경할 비밀번호")),
+                HeaderDocumentation.responseHeaders(
+                    HeaderDocumentation.headerWithName(HttpHeaders.AUTHORIZATION)
+                        .description("액세스 토큰")),
+                CookieDocumentation.responseCookies(
+                    CookieDocumentation.cookieWithName("Refresh").description("리프레시 토큰"))));
     ;
   }
 }
