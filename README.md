@@ -25,6 +25,9 @@
 
 <img width="946" alt="스크린샷 2023-11-22 오후 9 18 32" src="https://github.com/qushe8r/expense-manager/assets/115606959/81bb65f4-bd6d-416b-8316-0de1b6036f6e">
 
+- NAT는 Application에서 나가는 요청을 담당하고 있습니다.
+  - 나가는 요청을 따로 표시하면 혼잡해지기 때문에 요청에 대한 처리만 표시하였습니다. 
+
 ## 실행 방법
 
 ```
