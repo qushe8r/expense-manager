@@ -422,7 +422,8 @@ class ExpenseControllerTest {
         .andExpect(
             MockMvcResultMatchers.jsonPath("$.data.weeklyReports[0].oneWeekAgoExpenseAmount")
                 .isNumber())
-            .andDo(MockMvcRestDocumentation.document(
+        .andDo(
+            MockMvcRestDocumentation.document(
                 "get-expenses-report",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                 Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
@@ -442,13 +443,15 @@ class ExpenseControllerTest {
                     PayloadDocumentation.fieldWithPath("data.monthlyReports[].lastMonthBudget")
                         .type(JsonFieldType.NUMBER)
                         .description("지난달 예산"),
-                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].lastMonthExpenseTotals")
+                    PayloadDocumentation.fieldWithPath(
+                            "data.monthlyReports[].lastMonthExpenseTotals")
                         .type(JsonFieldType.NUMBER)
                         .description("지난달 동일 지출 합계"),
                     PayloadDocumentation.fieldWithPath("data.monthlyReports[].thisMonthBudget")
                         .type(JsonFieldType.NUMBER)
                         .description("이번달 카테고리 예산"),
-                    PayloadDocumentation.fieldWithPath("data.monthlyReports[].thisMonthExpenseTotals")
+                    PayloadDocumentation.fieldWithPath(
+                            "data.monthlyReports[].thisMonthExpenseTotals")
                         .type(JsonFieldType.NUMBER)
                         .description("이번달 현재 지출 합계"),
                     PayloadDocumentation.fieldWithPath("data.weeklyReports")
@@ -460,10 +463,12 @@ class ExpenseControllerTest {
                     PayloadDocumentation.fieldWithPath("data.weeklyReports[].categoryName")
                         .type(JsonFieldType.STRING)
                         .description("카테고리 이름"),
-                    PayloadDocumentation.fieldWithPath("data.weeklyReports[].twoWeeksAgoExpenseAmount")
+                    PayloadDocumentation.fieldWithPath(
+                            "data.weeklyReports[].twoWeeksAgoExpenseAmount")
                         .type(JsonFieldType.NUMBER)
                         .description("저번주 1주일간 지출 합계"),
-                    PayloadDocumentation.fieldWithPath("data.weeklyReports[].oneWeekAgoExpenseAmount")
+                    PayloadDocumentation.fieldWithPath(
+                            "data.weeklyReports[].oneWeekAgoExpenseAmount")
                         .type(JsonFieldType.NUMBER)
                         .description("최근 1주일간 지출 합계"))));
 
