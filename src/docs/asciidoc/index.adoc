@@ -7,7 +7,7 @@
 
 Sim Hyunbo <Qushe8r@gmail.com>
 
-v1.0.0, 2023.11.23
+v1.0.1, 2023.11.29
 
 ***
 == Member
@@ -30,6 +30,23 @@ include::{snippets}/post-members/http-response.adoc[]
 
 .response-headers
 include::{snippets}/post-members/response-headers.adoc[]
+
+=== 비밀번호 수정
+
+.curl-request
+include::{snippets}/patch-members-password/curl-request.adoc[]
+
+.http-request
+include::{snippets}/patch-members-password/http-request.adoc[]
+
+.request-body
+include::{snippets}/patch-members-password/request-body.adoc[]
+
+.request-fields
+include::{snippets}/patch-members-password/request-fields.adoc[]
+
+.http-response
+include::{snippets}/patch-members-password/http-response.adoc[]
 
 == Category
 === 카테고리 등록
