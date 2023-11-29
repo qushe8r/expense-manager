@@ -7,7 +7,7 @@
 
 Sim Hyunbo <Qushe8r@gmail.com>
 
-v1.0.0, 2023.11.23
+v1.0.1, 2023.11.29
 
 ***
 == Member
@@ -30,6 +30,67 @@ include::{snippets}/post-members/http-response.adoc[]
 
 .response-headers
 include::{snippets}/post-members/response-headers.adoc[]
+
+=== 비밀번호 수정
+
+.curl-request
+include::{snippets}/patch-members-password/curl-request.adoc[]
+
+.http-request
+include::{snippets}/patch-members-password/http-request.adoc[]
+
+.request-body
+include::{snippets}/patch-members-password/request-body.adoc[]
+
+.request-fields
+include::{snippets}/patch-members-password/request-fields.adoc[]
+
+.http-response
+include::{snippets}/patch-members-password/http-response.adoc[]
+
+== Auth
+=== 로그인
+
+.curl-request
+include::{snippets}/post-sign-in/curl-request.adoc[]
+
+.http-reqeust
+include::{snippets}/post-sign-in/http-request.adoc[]
+
+.request-body
+include::{snippets}/post-sign-in/request-body.adoc[]
+
+.request-fields
+include::{snippets}/post-sign-in/request-fields.adoc[]
+
+.http-response
+include::{snippets}/post-sign-in/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-sign-in/response-headers.adoc[]
+
+.response-cookies
+include::{snippets}/post-sign-in/response-cookies.adoc[]
+
+=== 토큰 재발급
+
+.curl-request
+include::{snippets}/post-reissue/curl-request.adoc[]
+
+.http-request
+include::{snippets}/post-reissue/http-request.adoc[]
+
+.request-cookies
+include::{snippets}/post-reissue/request-cookies.adoc[]
+
+.http-response
+include::{snippets}/post-reissue/http-response.adoc[]
+
+.response-headers
+include::{snippets}/post-reissue/response-headers.adoc[]
+
+.response-cookies
+include::{snippets}/post-reissue/response-cookies.adoc[]
 
 == Category
 === 카테고리 등록
