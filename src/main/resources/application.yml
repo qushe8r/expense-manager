@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mysql-db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezon=Asia/Seoul&characterEncoding=UTF-8
+    username: expense
+    password: manager
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+
+jwt:
+  secret: ThisApplicationMadeForProjectManagementThisApplicationMadeForProjectManagement
+  access-token-expiration-minutes: 40
+  refresh-token-expiration-minutes: 420
+
+redis:
+  host: localhost
+  port: 6379
+
+cookie:
+  domain: localhost
+
+discord:
+  baseUrl: https://discord.com/api/webhooks
+  username: Expense-Manager
+  avatarUrl: https://github-production-user-asset-6210df.s3.amazonaws.com/115606959/283298026-1357cebc-5d3e-4264-b9cb-f17ad1fdc442.png
+  content: >
+    ### 좋은 아침입니다. 오늘도 활기찬 하루를 보내보세요!
+  author:
+    icon: https://cdn-icons-png.flaticon.com/256/5726/5726532.png
+  thumbnail: https://github-production-user-asset-6210df.s3.amazonaws.com/115606959/283298096-8367f187-09af-442e-a5e4-eb669338a7fa.png
+  color: 15258703
+  total:
+    name: "총합 (모든 카테고리)"
+  footer:
+    text: 이용해 주셔서 감사합니다.
+  phrase:
+    red: '**경고! 지출이 너무 많습니다!**'
+    green: '**예정대로 잘 하고 있습니다!**'
