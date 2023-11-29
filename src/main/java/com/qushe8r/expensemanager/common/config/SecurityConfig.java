@@ -30,6 +30,8 @@ public class SecurityConfig {
     return http.authorizeHttpRequests(
             authorize ->
                 authorize
+                    .requestMatchers("/index.html")
+                    .permitAll()
                     .requestMatchers("/members/**")
                     .permitAll()
                     .requestMatchers("/categories/**")

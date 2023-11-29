@@ -17,7 +17,7 @@ import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisOperations;
 
-@DataRedisTest
+@DataRedisTest(properties = "spring.data.redis.port=36379")
 class RefreshTokenRepositoryTest {
 
   private static final Charset CHARSET = StandardCharsets.UTF_8;
