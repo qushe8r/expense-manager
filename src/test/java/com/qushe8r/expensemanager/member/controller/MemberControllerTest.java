@@ -12,6 +12,8 @@ import com.qushe8r.expensemanager.member.entity.MemberDetails;
 import com.qushe8r.expensemanager.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.BDDMockito;
@@ -37,6 +39,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @WebMvcTest(MemberController.class)
 @Import(TestSecurityConfig.class)
 @AutoConfigureRestDocs
+@Execution(ExecutionMode.SAME_THREAD)
 class MemberControllerTest {
 
   private static final String EMAIL_EXAMPLE = "test@email.com";

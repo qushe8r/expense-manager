@@ -235,8 +235,8 @@ class ExpenseServiceTest {
   void getReport() {
     // given
     MemberDetails memberDetails = new MemberDetails(1L, "test@email.com", "");
-    YearMonth thisMonth = YearMonth.of(2023, 11);
-    YearMonth lastMonth = YearMonth.of(2023, 10);
+    YearMonth thisMonth = YearMonth.now();
+    YearMonth lastMonth = thisMonth.minusMonths(1);
 
     BDDMockito.given(
             expenseReportRepository.reportMonthlyExpenses(
