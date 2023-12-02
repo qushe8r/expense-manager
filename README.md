@@ -48,6 +48,10 @@ docker run --name expense-manager-redis -d -p 6379:6379 redis
 ```
 ./script/build.sh
 ```
+- 스크립트 실행시 실행되고 있는 `expense-manager` 를 종료합니다.
+- 실행되고 있는 `expense-manager`를 종료 후에 테스트를 진행하기 위해 도커로 `33306`, `43306` 포트로 `MySQL`이 실행되고, `36379` 포트로 `Redis`가 실행됩니다.
+- 빌드 후에 테스트용으로 사용한 도커를 종료하고 `container`를 제거합니다.
+- `container` 제거 후에 빌드된 `.jar`를 실행합니다.
 
 ## API 명세서
 - 위 스크립트 실행후 http://localhost:8080/index.html 에서 볼 수 있습니다.
