@@ -26,7 +26,14 @@
 <img width="946" alt="스크린샷 2023-11-22 오후 9 18 32" src="https://github.com/qushe8r/expense-manager/assets/115606959/81bb65f4-bd6d-416b-8316-0de1b6036f6e">
 
 - NAT는 Application에서 나가는 요청을 담당하고 있습니다.
-  - 나가는 요청을 따로 표시하면 혼잡해지기 때문에 요청에 대한 처리만 표시하였습니다. 
+  - 나가는 요청을 따로 표시하면 혼잡해지기 때문에 요청에 대한 처리만 표시하였습니다.
+- Nginx 설정 ( Load Balance, Certbot )
+  <details>
+  <summary>Nginx 설정 이미지 보기</summary>
+  
+  <img width="885" alt="스크린샷 2023-12-02 오후 11 04 05" src="https://github.com/qushe8r/expense-manager/assets/115606959/552768d9-f06b-43b6-9d20-f0e56809cd74">
+  </details>
+  
 
 ## 실행 방법
 
@@ -49,6 +56,34 @@ docker run --name expense-manager-redis -d -p 6379:6379 redis
 
 <img width="1461" alt="스크린샷 2023-11-22 오후 9 44 23" src="https://github.com/qushe8r/expense-manager/assets/115606959/e0c9d8d9-d25c-478a-83c7-7ac526ff0114">
 
+## 알림 서비스를 위한 회원의 예산, 지출 조회 성능 개선
+- 속도 개선을 테스트 하기 위해 유저를 500명, 지출 데이터를 1000만건 입력 후 성능 테스트 진행하였습니다.
+- 쿼리에서 `Budget`이 `MemberCategoryId`의 `FK Index`만 적용되어 느렸던 쿼리를 검색조건인 `expenseAt`과 함께 `복합 인덱스`로 성능 개선 하였습니다.
+  - 1200% 성능 개선 ( 2s 191ms --> 164ms )
+- 개선 전 ( 2s 191ms )
+  <img width="965" alt="스크린샷 2023-12-02 오후 8 13 35" src="https://github.com/qushe8r/expense-manager/assets/115606959/06b2ff8a-56cb-4e4a-911b-c736e08bff30">
+
+[//]: # (  <details>)
+
+[//]: # (  <summary>개선 전 쿼리 실행 속도 확인하기 - 이미지</summary>)
+
+[//]: # ()
+[//]: # (  <img width="965" alt="스크린샷 2023-12-02 오후 8 13 35" src="https://github.com/qushe8r/expense-manager/assets/115606959/06b2ff8a-56cb-4e4a-911b-c736e08bff30">)
+
+[//]: # (  </details>)
+  
+- 개선 후 ( 164ms )
+  <img width="965" alt="스크린샷 2023-12-02 오후 2 56 50 복사본" src="https://github.com/qushe8r/expense-manager/assets/115606959/850fa9ae-d9b6-415f-87e7-056f8bb54890">
+
+[//]: # (  <details>)
+
+[//]: # (  <summary>개선 후 쿼리 실행 속도 확인하기 - 이미지</summary>)
+
+[//]: # ()
+[//]: # (  <img width="965" alt="스크린샷 2023-12-02 오후 2 56 50 복사본" src="https://github.com/qushe8r/expense-manager/assets/115606959/850fa9ae-d9b6-415f-87e7-056f8bb54890">)
+
+[//]: # (  </details>)
+
 ## TEST
 ### 커버리지 100%
   <img width="478" alt="스크린샷 2023-11-22 오후 9 45 46" src="https://github.com/qushe8r/expense-manager/assets/115606959/d740a0ab-aed8-4713-bfd4-183f43c2a391">
@@ -56,8 +91,38 @@ docker run --name expense-manager-redis -d -p 6379:6379 redis
 ###  테스트 최적화
 - Read/Write 구분
   - 테스트를 위해 매번 테스트에서 데이터를 준비하는 과정을 생략할 수 있습니다.
-- Read Data Base 기본 구성
+- Read Database 분리
+  - 데이터 베이스 준비를 반복해서 하지 않기 위해서 Read Database를 분리 했습니다.
 - Write Data Base 기본 구성
+  - 테스트에서 `@Transactional`을 사용하면 테스트 전체에 트랜잭션이 걸려서 실제 동작과 다르게 작동할 수 있기 때문에 Write Database를 분리 했습니다.
+
+### 빌드 시간 개선
+- 반복되는 테스트의 실행시간을 줄이려고 노력하였습니다.
+- 테스트 병렬 실행으로 테스트 실행 시간이 줄어들어 빌드 시간이 개선 되었습니다.
+  - 145% 속도 개선 ( 29s --> 20s )
+- 개선 전
+  <img width="1642" alt="스크린샷 2023-12-02 오후 9 05 54 복사본" src="https://github.com/qushe8r/expense-manager/assets/115606959/2d21cde2-67e8-451e-b3b5-1325bd4d2e78">
+
+[//]: # (  <details>)
+
+[//]: # (  <summary>개선 전 빌드 시간 확인하기 - 이미지</summary>)
+
+[//]: # ()
+[//]: # (  <img width="1642" alt="스크린샷 2023-12-02 오후 9 05 54 복사본" src="https://github.com/qushe8r/expense-manager/assets/115606959/2d21cde2-67e8-451e-b3b5-1325bd4d2e78">)
+
+[//]: # (  </details>)
+
+- 개선 후
+  <img width="1642" alt="스크린샷 2023-12-02 오후 9 50 54 복사본" src="https://github.com/qushe8r/expense-manager/assets/115606959/8697c636-9175-49f5-bb3d-0c8761db8b60">
+
+[//]: # (  <details>)
+
+[//]: # (  <summary>개선 전 빌드 시간 확인하기 - 이미지</summary>)
+
+[//]: # ()
+[//]: # (  <img width="1642" alt="스크린샷 2023-12-02 오후 9 50 54 복사본" src="https://github.com/qushe8r/expense-manager/assets/115606959/8697c636-9175-49f5-bb3d-0c8761db8b60">)
+
+[//]: # (  </details>)
 
 ### 테스트 의존성 사용
 - await
@@ -77,9 +142,10 @@ docker run --name expense-manager-redis -d -p 6379:6379 redis
     - `TestSecurityConfig`를 적용한 테스트에 `@WithMemberPrincipals`를 적용하여 테스트 하였습니다.
 
 ### ArgumentMatcher
-  - Mockito를 사용하여 mock 테스트를 진행할때 mock의 입력값에 대해서도 검증 할 수 있습니다.
+  - `Mockito`를 사용하여 mock 테스트를 진행할때 `mock의 입력값`에 대해서도 검증 할 수 있습니다.
   - 입력값을 검증하지 않는다면 입력값이 다를 경우에도 테스트가 성공하기 때문에 반쪽짜리 테스트가 됩니다.
-  - (이미지 추가)
+
+[//]: # (  - &#40;이미지 추가&#41;)
 
 [//]: # (설명 이미지)
 
